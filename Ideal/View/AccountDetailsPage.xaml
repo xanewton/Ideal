@@ -19,12 +19,112 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Ideal"
+      xmlns:chart="http://schemas.syncfusion.com/wpf"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
       Title="AccountDetailsPage">
 
-    <Grid>
-        <Label x:Name="label" Content="Account Details Page" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+    <DockPanel>
+        <!-- DATA context -->
+        <DockPanel.DataContext>
+            <local:AccountDetailsViewModel />
+        </DockPanel.DataContext>
+    
 
-    </Grid>
+        <!-- Summary table-->
+        <Grid DockPanel.Dock="Top" Background="#00000000" Height="70">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="140" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontFamily="Segoe UI" FontSize="22" Foreground="#424242"> Account Details</TextBlock>
+
+            <Border Grid.Column="1" >
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Green"
+                                            Style="{StaticResource AmountStyle}"
+                                            Text="{Binding PositiveAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Style="{StaticResource AmountTypeStyle}" Text="Collected" />
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center"  VerticalAlignment="Center"
+                                            Style="{StaticResource TransactionStyle}"
+                                            Text="{Binding NoPositiveTransactions}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Style="{StaticResource TransactionStyle}"  Text=" Transactions" />
+                        </StackPanel>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+            <Border Grid.Column="2">
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"
+                                            Style="{StaticResource AmountStyle}"
+                                            Text="{Binding NegativeAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                    Style="{StaticResource AmountTypeStyle}" Text="Lag" />
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Style="{StaticResource TransactionStyle}"
+                                            Text="{Binding NoNegativeTransactions}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Style="{StaticResource TransactionStyle}" Text=" Transactions" />
+                        </StackPanel>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+            <Border Grid.Column="3">
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Foreground="Orange" Style="{StaticResource AmountStyle}"
+                                            Text="{Binding BalanceAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Style="{StaticResource AmountTypeStyle}" Text="Balance" />
+                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"/>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Account ID selector -->
+                <ComboBox Grid.Row="0" Name="cmbAccount" Width="70" Height="20"
+                      SelectedItem="{Binding SelectedItemAccountID}" ItemsSource="{Binding AccountIDs}" />
+
+                <!-- Account details table -->
+                <DataGrid IsReadOnly="True" Grid.Row="1" ItemsSource="{Binding Details}"
+                      Margin="2" Height="150"
+                      HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5"/>
+            </Grid>
+
+            
+            
+        </Grid>
+
+    </DockPanel>
 </Page>

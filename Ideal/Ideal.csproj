@@ -84,6 +84,7 @@
     <Compile Include="DBModel\REFERENCE_TBL.cs" />
     <Compile Include="DBModel\SCHEDULED_PAYMENT_TBL.cs" />
     <Compile Include="DBModel\TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
+    <Compile Include="ViewModel\AccountDetailsViewModel.cs" />
     <Compile Include="ViewModel\RunningAccountsViewModel.cs" />
     <Compile Include="View\AccountDetailsPage.xaml.cs">
       <DependentUpon>AccountDetailsPage.xaml</DependentUpon>
