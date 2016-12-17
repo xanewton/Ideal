@@ -1,6 +1,9 @@
 ﻿IDEAL Furniture
 ===============
 
+![alt tag](https://github.com/an-garcia/Ideal/blob/master/readme/ScreenShot-1.png)
+![alt tag](https://github.com/an-garcia/Ideal/blob/master/readme/ScreenShot-2.png)
+
 IDEAL Furniture is a prototype Windows Desktop application that displays charts for a Furniture store.
 The application goal is to visually represent the current status of the accounts using charts. 
 The information of the accounts will come from a SQL database.
