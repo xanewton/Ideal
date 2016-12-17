@@ -33,10 +33,10 @@ namespace Ideal
         public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
         public ObservableCollection<String> AccountIDs { get; private set; }
         public ObservableCollection<DetailModel> Details { get; set; }
-        public ObservableCollection<Model> Totals { get; set; }
+        public ObservableCollection<Model> Totals { get; set; } // Total chart
         public ObservableCollection<PaymentModel> Payments { get; set; }
-        public ObservableCollection<Model> TotalProgress { get; set; }
-        public ObservableCollection<Model> TotalLag { get; set; }
+        public ObservableCollection<Model> TotalProgress { get; set; } // Progress chart
+        public ObservableCollection<Model> TotalLag { get; set; }  //Lag chart
 
 
         private List<PAYMENT_TBL> listPayments;
@@ -124,6 +124,7 @@ namespace Ideal
                             FillStatusValues(selectedItemAccountID);
                             FillTotalProgress(selectedItemAccountID);
                             FillTotalLag(selectedItemAccountID);
+                            FillTotals(selectedItemAccountID);
                         }
                         catch (System.Data.SqlClient.SqlException e)
                         {
@@ -154,6 +155,7 @@ namespace Ideal
                     FillStatusValues(selectedItemAccountID);
                     FillTotalProgress(selectedItemAccountID);
                     FillTotalLag(selectedItemAccountID);
+                    FillTotals(selectedItemAccountID);
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -279,6 +281,23 @@ namespace Ideal
             });
             TotalLag.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
             RaisePropertyChanged("TotalLag");
+        }
+
+        /// <summary>
+        /// Fill the total values using the accountId.
+        /// Reads from the Accounts list
+        /// </summary>
+        /// <param name="accountId"></param>
+        private void FillTotals(string accountId)
+        {
+            //Find the account
+            var acc = Accounts.Where(x => x.ACC_ID == accountId).First();
+            if (acc == null) { return; }
+            Totals = new ObservableCollection<Model>();
+            Totals.Add(new Model() { Item = "Expected", Units = (int)acc.SUM_SCHEDULED_PAYMENTS });
+            Totals.Add(new Model() { Item = "Invested", Units = (int)acc.ITEM_BUY_PRICE });
+            Totals.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
+            RaisePropertyChanged("Totals");
         }
     }
 }
