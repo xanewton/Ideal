@@ -25,24 +25,39 @@ using System.Windows;
 
 namespace Ideal
 {
+    /// <summary>
+    /// Used to store data for displaying in CostComparations chart.
+    /// NOTE: Parameter names are used in chart
+    /// </summary>
+    public class CostComparationModel
+    {
+        public string AccountID { get; set; }
+        public double? ItemPrice { get; set; }
+        public double? Collected { get; set; }
+        public double? Expected { get; set; }
+    }
 
     /// <summary>
-    /// Representation of the Running Accounts page
+    /// Class to represent Month and Week comparations
+    /// </summary>
+    public class ItemModel
+    {
+        public string Item { get; set; }
+        public int? Expected { get; set; }
+        public int? Collected { get; set; }
+    }
+
+
+
+    /// <summary>
+    ///  Series of data for the charts in *.xaml file
     /// </summary>
     class RunningAccountsViewModel
     {
 
-        public class CostComparationModel
-        {
-            public string AccountID { get; set; }
-            public double? ItemPrice { get; set; }
-            public double? Collected { get; set; }
-            public double? Expected { get; set; }
-        }
-
-
         public ObservableCollection<CostComparationModel> CostComparations { get; set; }
         public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
+        public ObservableCollection<ItemModel> Months { get; set; }
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -65,7 +80,9 @@ namespace Ideal
             set { _balanceAmount = value; }
         }
 
-
+        // Private list to save content of tables
+        private List<SCHEDULED_PAYMENT_TBL> listScheduledPay;
+        private List<PAYMENT_TBL> listPayments;
 
 
         public RunningAccountsViewModel()
@@ -76,6 +93,8 @@ namespace Ideal
                 {
                     db.Database.Connection.Open();
                     FillAccountSeries(db);
+                    FillPaymentLists(db);
+                    FillMonthSeries();
                     FillStatusValues();
                 }
                 catch (System.Data.SqlClient.SqlException e)
@@ -112,6 +131,104 @@ namespace Ideal
                         Collected = (double)acc.PAYMENTS,
                         Expected = (double)acc.SUM_SCHEDULED_PAYMENTS
                     });
+            }
+        }
+
+        /// <summary>
+        /// Store tables in temporal Lists to allow LINQ grouping queries.
+        /// </summary>
+        /// <param name="db"></param>
+        private void FillPaymentLists(IdealContext db)
+        {
+            // Get Scheduled Payments table
+            listScheduledPay = new List<SCHEDULED_PAYMENT_TBL>();
+            var queryScheduledPay = from p in db.SCHEDULED_PAYMENT_TBL
+                                    select p;
+            foreach (var p in queryScheduledPay)
+            {
+                listScheduledPay.Add(p);
+            }
+
+            // Get Payments table
+            listPayments = new List<PAYMENT_TBL>();
+            var queryPayments = from p in db.PAYMENT_TBL
+                                select p;
+            foreach (var p in queryPayments)
+            {
+                listPayments.Add(p);
+            }
+        }
+
+        /// <summary>
+        /// Query the lists and fill the series.
+        /// NOTE: DataEntity didn't generate all views from db (3 views missing).
+        /// </summary>
+        private void FillMonthSeries()
+        {
+            List<ItemModel> listMonth = new List<ItemModel>();
+            CalculateScheduledMonthPayments(listMonth);
+            CalculateMonthPayments(listMonth);
+
+            // Add to the Observable list
+            Months = new ObservableCollection<ItemModel>();
+            foreach (var item in listMonth)
+                Months.Add(item);
+        }
+
+        private void CalculateScheduledMonthPayments(List<ItemModel> listMonth)
+        {
+            var result = from k in listScheduledPay // work around: group by doest work with table
+                         group k by new
+                         {
+                             y = k.SCHPAY_DATE.Year,
+                             m = k.SCHPAY_DATE.Month
+                         } into g
+                         select new
+                         {
+                             Month = new DateTime(g.Key.y, g.Key.m, 1),
+                             Sum = g.Sum(p => p.SCHPAY_AMOUNT)
+                         };
+            foreach (var p in result)
+            {
+                listMonth.Add(new ItemModel() // Add all items
+                {
+                    Item = p.Month.ToString("yyyy MMM"),
+                    Expected = (int)p.Sum,
+                    Collected = null
+                });
+            }
+        }
+
+        private void CalculateMonthPayments(List<ItemModel> listMonth)
+        {
+            var result = from r in listPayments  // work around: group by doest work with table
+                         group r by new
+                         {
+                             y = r.PAY_DATE.Year,
+                             m = r.PAY_DATE.Month
+                         } into g
+                         select new
+                         {
+                             Month = new DateTime(g.Key.y, g.Key.m, 1),
+                             Sum = g.Sum(p => p.PAY_AMOUNT)
+                         };
+            foreach (var p in result)
+            {
+                string str = p.Month.ToString("yyyy MMM");
+                ItemModel month = listMonth.Find(x => x.Item.Equals(str));
+                if (month != null)
+                {
+                    month.Collected = (int)p.Sum;
+                }
+                else
+                {
+                    listMonth.Add(new ItemModel() // Add item
+                    {
+                        Item = str,
+                        Expected = null,
+                        Collected = (int)p.Sum
+                    });
+                }
             }
         }
 

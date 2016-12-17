@@ -13,6 +13,7 @@ Notes
 - The application was developed using Microsoft Visual Sudio Community 2015.
 - The application uses C# and Windows Presentation Fundation (WPF).
 - The database use Microsoft SQL Server 2016 Express or a local database.
+- SyncFussion charts 
 
 ### Menu of pages
 - Menu of pages is based on project  https://github.com/Microsoft/WPF-Samples Graphics/Brushes.
@@ -62,6 +63,13 @@ Notes
   in the Package Manager Console at the  PM> prompt:  Update-Database
 ```
 
+### SyncFussion charts
+- Install SyncFussion
+  1. Go to https://www.syncfusion.com/products/communitylicense and register.
+  2. Download Syncfusion Essential Studio WPF Setup file and follow the installation instructions 
+     https://help.syncfusion.com/wpf/installation-and-deployment 
+	 sections: Manual Installation, Configuring Syncfusion NuGet Packages in Visual Studio
+  3. Add the chart control, https://help.syncfusion.com/wpf/sfchart/getting-started
 
 
 License

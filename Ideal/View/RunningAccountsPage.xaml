@@ -19,6 +19,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Ideal"
+      xmlns:syncfusion="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
+      xmlns:chart="http://schemas.syncfusion.com/wpf"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
       Title="RunningAccountsPage">
@@ -30,8 +32,7 @@
             <local:RunningAccountsViewModel />
         </DockPanel.DataContext>
 
-        <!-- Label x:Name="label" Content="Running Accounts Page" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/ -->
-
+      
         <!-- Summary table-->
         <Grid DockPanel.Dock="Top" Background="#00000000" Height="70">
             <Grid.ColumnDefinitions>
@@ -85,7 +86,80 @@
                 </Viewbox>
             </Border>
         </Grid>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Month chart -->
+            <chart:SfChart Grid.Column="0" AreaBorderThickness="0,1,1,0" HorizontalAlignment="Center" Margin="2" Height="250" >
+                <chart:SfChart.Header>
+                    <TextBlock FontSize="15" FontFamily="Segoe UI" Foreground="Black"
+                               Margin="0,0,0,20">Month Revenue</TextBlock>
+                </chart:SfChart.Header>
+                <chart:SfChart.PrimaryAxis>
+                    <chart:CategoryAxis  PlotOffset="30" FontSize="9" />
+                </chart:SfChart.PrimaryAxis>
+                <chart:SfChart.SecondaryAxis>
+                    <chart:NumericalAxis Header="Money" FontSize="12" />
+                </chart:SfChart.SecondaryAxis>
+                <chart:SfChart.Legend>
+                    <chart:ChartLegend Visibility="Visible"/>
+                </chart:SfChart.Legend>
+                <chart:SfChart.Behaviors>
+                    <chart:ChartZoomPanBehavior EnableZoomingToolBar="True" ToolBarItemHeight="15" 
+                                              ToolBarItemWidth="15" ToolBarBackground="#00000000" 
+                                              ToolBarItems="All" ToolBarItemMargin="0"/>
+                </chart:SfChart.Behaviors>
+
+                <chart:AreaSeries EnableAnimation="True" Label="Expected"
+                                  ItemsSource="{Binding Months}" XBindingPath="Item" YBindingPath="Expected" 
+                                  ShowTooltip="True" Stroke="#FFbcbcbc" Interior="#99bcbcbc" StrokeThickness="2" >
+                    <chart:AreaSeries.AdornmentsInfo>
+                        <chart:ChartAdornmentInfo VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                                      AdornmentsPosition="Bottom" ShowLabel="True">
+                            <chart:ChartAdornmentInfo.LabelTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Ellipse Height="27" Width="27" Stroke="#FFbcbcbc" Fill="White" 
+                                                     StrokeThickness="2" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding}" Foreground="Black" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                   FontFamily="Segoe UI"  FontSize="10"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </chart:ChartAdornmentInfo.LabelTemplate>
+                        </chart:ChartAdornmentInfo>
+                    </chart:AreaSeries.AdornmentsInfo>
+                </chart:AreaSeries>
+                <chart:AreaSeries EnableAnimation="True" Label="Collected"
+                                  ItemsSource="{Binding Months}" XBindingPath="Item" YBindingPath="Collected" 
+                                  ShowTooltip="True" Stroke="#FF0000FF" Interior="#990000FF" StrokeThickness="2">
+                    <chart:AreaSeries.AdornmentsInfo>
+                        <chart:ChartAdornmentInfo VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                                      AdornmentsPosition="Bottom" ShowLabel="True">
+                            <chart:ChartAdornmentInfo.LabelTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Ellipse Height="27" Width="27" Stroke="#FF3333FF" Fill="White" 
+                                                 StrokeThickness="2" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding}" Foreground="Black" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                   FontFamily="Segoe UI" FontSize="10"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </chart:ChartAdornmentInfo.LabelTemplate>
+                        </chart:ChartAdornmentInfo>
+                    </chart:AreaSeries.AdornmentsInfo>
+                </chart:AreaSeries>
+            </chart:SfChart>
         
+        </Grid>
+
         <!-- Accounts table -->
         <DataGrid IsReadOnly="True"  DockPanel.Dock="Top" HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5"
                   HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" ItemsSource="{Binding Accounts}" 
