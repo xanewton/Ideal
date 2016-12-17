@@ -69,6 +69,7 @@ namespace Ideal
         public ObservableCollection<ItemModel> Months { get; set; }
         public ObservableCollection<Model> TotalProgress { get; set; }
         public ObservableCollection<Model> TotalLag { get; set; }
+        public ObservableCollection<Model> Totals { get; set; } // Represent the running account totals
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -109,6 +110,7 @@ namespace Ideal
                     FillTotalProgress();
                     FillTotalLag(db);
                     FillStatusValues();
+                    FillTotals(db);
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -286,6 +288,26 @@ namespace Ideal
             NegativeAmount = (Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS) > 0) ?
                                 (int)(Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS)) : 0; //Lag
             BalanceAmount = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE); //Balance
+        }
+
+        /// <summary>
+        /// Fill the totals values for all accounts
+        /// </summary>
+        /// <param name="db"></param>
+        private void FillTotals(IdealContext db)
+        {
+            Totals = new ObservableCollection<Model>();
+            var result = from r in db.TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW
+                         select r;
+            foreach (var t in result)
+            {
+                string description = null;
+                if (t.DESCRIPTION.Contains("Scheduled")) { description = "Expected"; }
+                else if (t.DESCRIPTION.Contains("ITEM")) { description = "Invested"; }
+                else { description = "Collected"; }
+
+                Totals.Add(new Model() { Item = description, Units = (int)t.VALUE });
+            }
         }
 
     }

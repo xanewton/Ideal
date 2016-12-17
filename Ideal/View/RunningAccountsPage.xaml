@@ -220,6 +220,52 @@
                 </chart:PieSeries>
             </chart:SfChart>
 
+            <!-- All account totals Chart -->
+            <chart:SfChart Grid.Column="3" AreaBorderBrush="#8e8e8e" 
+                       Background="White" Margin="2" Height="200" Width="200"
+                       VerticalAlignment="Bottom" AreaBorderThickness="0,1,1,1">
+                <chart:SfChart.Header>
+                    <TextBlock FontSize="15" Foreground="Black" FontFamily="Segoe UI" 
+                           Margin="0,-10,0,0">All Accounts</TextBlock>
+                </chart:SfChart.Header>
+                <chart:SfChart.PrimaryAxis>
+                    <chart:CategoryAxis  FontSize="12" Foreground="Black" />
+                </chart:SfChart.PrimaryAxis>
+                <chart:SfChart.SecondaryAxis>
+                    <chart:NumericalAxis FontSize="12" Header="Money" Foreground="Black" />
+                </chart:SfChart.SecondaryAxis>
+                <!--<chart:SfChart.Legend>
+                    <chart:ChartLegend Visibility="Visible"/>  Interior="#78FFD700"
+                </chart:SfChart.Legend>-->
+
+                <chart:ColumnSeries EnableAnimation="True" Palette="Custom" 
+                                ItemsSource="{Binding Totals}"  XBindingPath="Item" 
+                                YBindingPath="Units" ShowTooltip="True" >
+                    <chart:ColumnSeries.ColorModel>
+                        <chart:ChartColorModel>
+                            <chart:ChartColorModel.CustomBrushes>
+                                <SolidColorBrush Color="#99bcbcbc"/>
+                                <SolidColorBrush Color="#78FFD700"/>
+                                <SolidColorBrush Color="#780000FF"/>
+                            </chart:ChartColorModel.CustomBrushes>
+                        </chart:ChartColorModel>
+                    </chart:ColumnSeries.ColorModel>
+                    <chart:ColumnSeries.AdornmentsInfo>
+                        <chart:ChartAdornmentInfo AdornmentsPosition="Top" HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center" ShowLabel="True" ShowMarker="True">
+                            <chart:ChartAdornmentInfo.LabelTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBlock Text="{Binding}" Foreground="White" 
+					                        FontFamily="Segoe UI" Margin="0,50,0,0" FontSize="10"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </chart:ChartAdornmentInfo.LabelTemplate>
+                        </chart:ChartAdornmentInfo>
+                    </chart:ColumnSeries.AdornmentsInfo>
+                </chart:ColumnSeries>
+            </chart:SfChart>
+
         </Grid>
 
         <!-- Accounts table -->
