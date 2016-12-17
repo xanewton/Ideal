@@ -20,9 +20,18 @@ namespace Ideal
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public static RoutedUICommand ExitCommand =
+            new RoutedUICommand("Exit", "Exit", typeof(MainWindow));
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void ExecuteExitCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }
