@@ -74,7 +74,7 @@
     <Compile Include="DBModel\ADDRESS_TBL.cs" />
     <Compile Include="DBModel\CLIENT_TBL.cs" />
     <Compile Include="DBModel\EMPLOYEE_TBL.cs" />
-    <Compile Include="IdealContext.cs" />
+    <Compile Include="DBModel\IdealContext.cs" />
     <Compile Include="DBModel\ITEM_TBL.cs" />
     <Compile Include="DBModel\PAYMENTS_VIEW.cs" />
     <Compile Include="DBModel\PAYMENT_MODE_TBL.cs" />
@@ -146,7 +146,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ViewResources\toc.xml" />
+    <Resource Include="ViewResources\toc.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ViewResources\clouds.png" />
