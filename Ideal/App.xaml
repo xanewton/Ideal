@@ -4,6 +4,302 @@
              xmlns:local="clr-namespace:Ideal"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <XmlDataProvider x:Key="PageData" 
+              XPath="Pages" 
+              Source="ViewResources\toc.xml" />
+
+        <!-- TreeView Styles -->
+        <Style x:Key="TreeViewItemRadioButtonStyle" 
+               TargetType="{x:Type TreeViewItem}" >
+            <Setter Property="Margin" Value="2, 2, 2, 0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <RadioButton 
+                              Focusable="False" 
+                              IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}">
+                            <ContentPresenter 
+                                Name="PART_Header"
+                                ContentSource="Header" />
+                        </RadioButton>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ExpandCollapseToggleStyle"
+              TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="MinWidth"  Value="19"/>
+            <Setter Property="MinHeight" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border MinWidth="19"
+                                MinHeight="13"
+                                >
+                            <!-- Background="{StaticResource GlassBrushResource}" -->
+                            <Border MinWidth="9"
+                                  MinHeight="9"
+                                  BorderThickness="1"
+                                  
+                                  Background="Transparent"
+                                  SnapsToDevicePixels="true">
+                                <!-- BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" -->
+                                <Path x:Name="ExpandPath"
+                                      Stretch="Uniform"
+                                      Margin="1,1,1,1"
+                                      Fill="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+                                      Data="M 0 2 L 0 3 L 2 3 L 2 5 L 3 5 L 3 3 L 5 3 L 5 2 L 3 2 L 3 0 L 2 0 L 2 2 Z"/>
+                                <!--<Border.BitmapEffect>
+                                    <DropShadowBitmapEffect />
+                                </Border.BitmapEffect>-->
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter Property="Data"
+                                        TargetName="ExpandPath"
+                                        Value="M 0 2 L 0 3 L 5 3 L 5 2 Z"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TreeViewItemFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="0,0,0,0"
+                                    StrokeThickness="5"
+                                    Stroke="{x:Static SystemColors.HighlightBrush}"
+                                    StrokeDashArray="1 2"
+                                    Opacity="1" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TreeViewItemHeaderStyle" TargetType="{x:Type TreeViewItem}" >
+            <Setter Property="Margin" Value="2, 2, 2, 0" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Offset="0.0" Color="#22cc99ff" />
+                        <GradientStop Offset="1.0" Color="#37cc99ff" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Rectangle x:Name="outerRectangle" 
+                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                       Fill="{TemplateBinding Background}" RadiusX="10" RadiusY="10" 
+                                       StrokeThickness="5" Grid.ColumnSpan="2" Opacity="1" />
+
+                            <Rectangle x:Name="glassCube" 
+                                       Grid.ColumnSpan="2" HorizontalAlignment="Stretch" 
+                                       VerticalAlignment="Stretch"
+                                       StrokeThickness="1" RadiusX="10" RadiusY="10" Opacity="0">
+                                <Rectangle.Fill>
+                                    <ImageBrush x:Name="glassCubeBrush"
+                                                ImageSource="ViewResources\clouds.png" 
+                                                Viewport="0,0,300,300" ViewportUnits="Absolute"
+                                                TileMode="FlipXY" />
+                                </Rectangle.Fill>
+                                <Rectangle.Stroke>
+                                    <LinearGradientBrush StartPoint="0.5,0.0" EndPoint="0.5,1.0">
+                                        <GradientStop Color="Transparent" Offset="0" />
+                                        <GradientStop Color="Gray" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Stroke>
+
+                                <Rectangle.BitmapEffect>
+                                    <BitmapEffectGroup>
+                                        <OuterGlowBitmapEffect x:Name="glowBitmapEffect" GlowColor="Gray" />
+                                        <BevelBitmapEffect BevelWidth="1" />
+                                    </BitmapEffectGroup>
+                                </Rectangle.BitmapEffect>
+                            </Rectangle>
+
+                            <ToggleButton Name="ExpanderIcon"
+                                          Grid.Row="0" Grid.Column="0"
+                                          Style="{StaticResource ExpandCollapseToggleStyle}"
+                                          IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press" />
+
+                            <Image Name="ItemIcon"
+                                   Grid.Row="0" Grid.Column="0"
+                                   
+                                   Visibility="Hidden"
+                                   Margin="2" />
+                            <!-- Source="{StaticResource PaperDrawingImage}" -->
+
+                            <ContentPresenter Name="PART_Header" Grid.Column="1" Margin="10,5,10,5" 
+                                              TextBlock.Foreground="Black" ContentSource="Header" />
+
+                            <ToggleButton Name="Expander"   
+                                          Grid.Column="0" Grid.ColumnSpan="2"
+                                          Visibility="Visible"
+                                          IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate>
+                                        <Rectangle Fill="Transparent" />
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+
+                            </ToggleButton>
+
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Grid.Column="1" />
+
+                        </Grid>
+                        <ControlTemplate.Triggers>
+
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="true" />
+                                    <Condition Property="IsSelected" Value="False" />
+                                </MultiTrigger.Conditions>
+
+                                <MultiTrigger.EnterActions>
+                                    <RemoveStoryboard BeginStoryboardName="UncheckedBeginStoryboard" />
+                                    <BeginStoryboard Name="MouseOverBeginStoryboard">
+                                        <Storyboard>
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="glassCube"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0.75"
+                                                Duration="0:0:0.1" />
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="glassCubeBrush"
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0.75" To="0.5" AutoReverse="True"
+                                                RepeatBehavior="Forever"
+                                                Duration="0:0:0.75" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <RemoveStoryboard BeginStoryboardName="MouseOverBeginStoryboard" />
+
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
+
+                            <EventTrigger RoutedEvent="TreeViewItem.Selected">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation 
+                                              Storyboard.TargetName="glassCube"
+                                              Storyboard.TargetProperty="Opacity"
+                                              To="0.75" 
+                                              Duration="0:0:0.1" />
+                                        <DoubleAnimation 
+                                              Storyboard.TargetName="glassCube"
+                                              Storyboard.TargetProperty="StrokeThickness"
+                                              To="2"
+                                              Duration="0:0:0.1" />
+                                        <ColorAnimation 
+                                              Storyboard.TargetName="glowBitmapEffect"
+                                              Storyboard.TargetProperty="GlowColor"
+                                              To="{x:Static SystemColors.HighlightColor}"
+                                              Duration="0:0:1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="TreeViewItem.Unselected">
+                                <BeginStoryboard Name="UncheckedBeginStoryboard">
+                                    <Storyboard>
+                                        <DoubleAnimation 
+                                              Storyboard.TargetName="glassCube"
+                                              Storyboard.TargetProperty="Opacity"
+                                              To="0"
+                                              Duration="0:0:0.1" />
+                                        <DoubleAnimation 
+                                              Storyboard.TargetName="glassCube"
+                                              Storyboard.TargetProperty="StrokeThickness"
+                                              To="1"
+                                              Duration="0:0:0.1" />
+                                        <ColorAnimation 
+                                              Storyboard.TargetName="glowBitmapEffect"
+                                              Storyboard.TargetProperty="GlowColor"
+                                              To="{x:Static SystemColors.ControlColor}"
+                                              Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="Rectangle.Stroke" 
+                                        Value="{x:Static SystemColors.HighlightBrush}" 
+                                        TargetName="outerRectangle" />
+                                <Setter Property="Rectangle.Opacity" Value="1" TargetName="glassCube" />
+                            </Trigger>
+
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter TargetName="ItemsHost"
+                                        Property="Visibility"
+                                        Value="Collapsed"/>
+
+                            </Trigger>
+                            <Trigger Property="HasItems"
+                                     Value="False">
+                                <Setter TargetName="Expander"
+                                        Property="Visibility"
+                                        Value="Hidden"/>
+                                <Setter TargetName="ExpanderIcon"
+                                        Property="Visibility"
+                                        Value="Hidden"/>
+                                <Setter TargetName="ItemIcon"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <!--  Basic Background colors  -->
+        <LinearGradientBrush x:Key="BaseBackgroundColor" StartPoint="0.5,0" EndPoint="0.5,1">
+            <GradientStop Offset="0" Color="#FFFAFAFA" />
+            <GradientStop Offset="1" Color="#FFECECEC" />
+        </LinearGradientBrush>
+
+        <Style x:Key="AmountStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="34" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="Regular" />
+        </Style>
+        <Style x:Key="AmountTypeStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="Regular" />
+        </Style>
+        <Style x:Key="TransactionStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="Regular" />
+        </Style>
+
     </Application.Resources>
 </Application>

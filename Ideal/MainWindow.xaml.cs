@@ -10,8 +10,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace Ideal
 {
@@ -33,5 +35,36 @@ namespace Ideal
         {
             Application.Current.Shutdown();
         }
+
+        private void MyFrameNavigated(object sender, NavigationEventArgs e)
+        {
+            var myFadeInAnimation = (DoubleAnimation)Resources["MyFadeInAnimationResource"];
+            myFrame.BeginAnimation(OpacityProperty, myFadeInAnimation, HandoffBehavior.SnapshotAndReplace);
+        }
+
+        private void TransitionAnimationStateChanged(object sender, EventArgs e)
+        {
+            var transitionAnimationClock = (AnimationClock)sender;
+            if (transitionAnimationClock.CurrentState == ClockState.Filling)
+            {
+                FadeEnded();
+            }
+        }
+
+        private void FadeEnded()
+        {
+            var el = (XmlElement)myPageList.SelectedItem;
+            var att = el.Attributes["Uri"];
+            if (att != null)
+            {
+                myFrame.Navigate(new Uri(att.Value, UriKind.Relative));
+            }
+            else
+            {
+                myFrame.Content = null;
+            }
+        }
+
     }
 }
+

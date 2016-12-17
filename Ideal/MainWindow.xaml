@@ -7,6 +7,15 @@
         mc:Ignorable="d"
         Title="IDEAL Furniture" Height="350" Width="525">
 
+    <Window.Resources>
+        <HierarchicalDataTemplate x:Key="PagesDataTemplate"
+            ItemsSource="{Binding XPath=Children/Page}">
+            <TextBlock 
+                Text="{Binding XPath=@Title}" 
+                ToolTip="{Binding XPath=Description}" />
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    
     <DockPanel Name="mainPanel" >
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File" >
@@ -26,7 +35,67 @@
             <MenuItem Header="_Help" >
             </MenuItem>
         </Menu>
-    </DockPanel>
 
+        <Rectangle 
+            DockPanel.Dock="Top"
+            Height="1"
+            Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+        <Rectangle 
+            DockPanel.Dock="Top"
+            Height="1"
+            Fill="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+
+        <Border DockPanel.Dock="Left" BorderBrush="LightGray" BorderThickness="0,0,2,0" 
+                >
+            <!-- Background="sc#1.000000, 0.769689, 0.831936, 1.000000" -->
+
+            <Expander ExpandDirection="Left">
+                <Expander.Header>
+                    <TextBlock Foreground="#99000000"
+                        FontFamily="Verdana" FontWeight="Bold" FontSize="16pt" 
+                        Text="Contents">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Expander.Header>
+
+                <!-- Lists the different page samples. The list is
+                   defined in the ViewResources\toc.xml file. -->
+                <TreeView Name="myPageList"
+                          KeyboardNavigation.DirectionalNavigation="Cycle" 
+                          BorderBrush="Transparent"
+                          Background="Transparent"
+                          ItemTemplate="{DynamicResource PagesDataTemplate}"
+                          ItemContainerStyle="{StaticResource TreeViewItemHeaderStyle}"
+                          SelectedValuePath="SamplePage">
+                    <!--ItemContainerStyle="{StaticResource TreeViewItemHeaderStyle}" -->
+                    <TreeView.ItemsSource>
+                        <Binding Source="{StaticResource PageData}" XPath="*"/>
+                    </TreeView.ItemsSource>
+                    <TreeView.Triggers>
+                        <EventTrigger RoutedEvent="TreeView.SelectedItemChanged">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation 
+                                          Storyboard.TargetName="myFrame"
+                                          Storyboard.TargetProperty="Opacity" 
+                                          From="1" To="0" Duration="0:0:0.1" 
+                                          CurrentStateInvalidated="TransitionAnimationStateChanged"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TreeView.Triggers>
+                </TreeView>
+            </Expander>
+        </Border>
+
+        <ScrollViewer VerticalAlignment="Stretch">
+            <Frame Name="myFrame" 
+                   NavigationUIVisibility="Hidden"
+                   Navigated="MyFrameNavigated" Source="View\RunningAccountsPage.xaml"
+                   VerticalAlignment="Stretch" />
+        </ScrollViewer>
+    </DockPanel>
 
 </Window>

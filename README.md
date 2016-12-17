@@ -1,7 +1,22 @@
 IDEAL Furniture
 ===============
 
-IDEAL is a Windows Desktop application for displying accounts information using charts for a furniture store.
+IDEAL Furniture is a prototype Windows Desktop application that displays charts for a Furniture store.
+The application goal is to visually represent the current status of the accounts using charts. 
+The information of the accounts will come from a SQL database.
+All components are intended to use free Technology.
+
+
+Notes
+-----
+### Technology
+- The application was developed using Microsoft Visual Sudio Community 2015.
+- The application uses C# and Windows Presentation Fundation (WPF).
+- The database was developed using Microsoft SQL Server 2016 Express.
+
+### Menu of pages
+- Menu of pages is based on project  https://github.com/Microsoft/WPF-Samples Graphics/Brushes.
+
 
 
 

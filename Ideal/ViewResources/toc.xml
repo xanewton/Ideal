@@ -1,0 +1,23 @@
+﻿<Pages xmlns="">
+  <Page
+    Title="SamplePage"
+    PageClass="BrushesIntroduction.BrushTypesExample"
+    Uri="View\SamplePage.xaml">
+    <Description>Shows simple sample page.</Description>
+  </Page>
+
+  <Page Title="Accounts">
+    <Children>
+      <Page Title="Running Accounts"
+        Uri="View\RunningAccountsPage.xaml">
+        <Description>Shows information for the running accounts.</Description>
+      </Page>
+
+      <Page Title="Account Details"
+        Uri="View\AccountDetailsPage.xaml">
+        <Description>Shows the account details.</Description>
+      </Page>
+    </Children>
+  </Page>
+
+</Pages>
