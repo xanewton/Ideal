@@ -69,20 +69,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW.cs" />
-    <Compile Include="ACCOUNT_TBL.cs" />
-    <Compile Include="ADDRESS_TBL.cs" />
-    <Compile Include="CLIENT_TBL.cs" />
-    <Compile Include="EMPLOYEE_TBL.cs" />
+    <Compile Include="DBModel\ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW.cs" />
+    <Compile Include="DBModel\ACCOUNT_TBL.cs" />
+    <Compile Include="DBModel\ADDRESS_TBL.cs" />
+    <Compile Include="DBModel\CLIENT_TBL.cs" />
+    <Compile Include="DBModel\EMPLOYEE_TBL.cs" />
     <Compile Include="IdealContext.cs" />
-    <Compile Include="ITEM_TBL.cs" />
-    <Compile Include="PAYMENTS_VIEW.cs" />
-    <Compile Include="PAYMENT_MODE_TBL.cs" />
-    <Compile Include="PAYMENT_TBL.cs" />
-    <Compile Include="PROVIDER_TBL.cs" />
-    <Compile Include="REFERENCE_TBL.cs" />
-    <Compile Include="SCHEDULED_PAYMENT_TBL.cs" />
-    <Compile Include="TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
+    <Compile Include="DBModel\ITEM_TBL.cs" />
+    <Compile Include="DBModel\PAYMENTS_VIEW.cs" />
+    <Compile Include="DBModel\PAYMENT_MODE_TBL.cs" />
+    <Compile Include="DBModel\PAYMENT_TBL.cs" />
+    <Compile Include="DBModel\PROVIDER_TBL.cs" />
+    <Compile Include="DBModel\REFERENCE_TBL.cs" />
+    <Compile Include="DBModel\SCHEDULED_PAYMENT_TBL.cs" />
+    <Compile Include="DBModel\TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
     <Compile Include="View\AccountDetailsPage.xaml.cs">
       <DependentUpon>AccountDetailsPage.xaml</DependentUpon>
     </Compile>
@@ -154,6 +154,7 @@
   <ItemGroup>
     <Resource Include="ViewResources\Graphicrating-Koloria-Chart-Bar-Document.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

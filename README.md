@@ -33,7 +33,7 @@ Notes
 	 Code First from database -> New connection to ideal.dbo -> Select all Tables and Views. 
 	 This will generate classes for each item. 
 	 Note that some Views will not be generated, but, this seems to be an EntityFramework error. Ignore it and continue.
-	 Create a folder 'DatabaseModel' and move all items there.
+	 Create a folder 'DBModel' and move all items there.
 
     NOTES: To connect to SQL Server Express add a new connection using
            .\sqlexpress in the server name the select ideal.db usign Windows Authentication.
