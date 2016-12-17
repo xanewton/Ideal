@@ -47,21 +47,19 @@ Notes
   "An unhandled exception of type 'System.InvalidOperationException' occurred in EntityFramework.dll
    Additional information: The model backing the 'BookContext' has changed since the database was created.
    Consider using Code First Migrations to update the database (http://go.microsoft.com/fwlink/?LinkId=238269)."
-```
+
   As the error message suggests, you need to add the Code First Migrations package to your program.
 
-```
   a) go to Tools ➪ NuGet Package Manager ➪ Package Manager Console
   b) To enable automatic migration of your database to your updated class structure, enter this command
      in the Package Manager Console at the PM> prompt:
       Enable-Migrations –EnableAutomaticMigrations
-```
 
   This adds a Migrations class to your project. Migration/Configuration.cs
   The Entity Framework will compare the timestamp of the database to your program and advise you
   when the database is out of sync with your classes. To update the database, simply enter this command
-  in the Package Manager Console at the 
-``` PM> prompt:  Update-Database```
+  in the Package Manager Console at the  PM> prompt:  Update-Database
+```
 
 
 
