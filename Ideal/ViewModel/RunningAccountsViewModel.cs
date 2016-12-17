@@ -68,6 +68,7 @@ namespace Ideal
         public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
         public ObservableCollection<ItemModel> Months { get; set; }
         public ObservableCollection<Model> TotalProgress { get; set; }
+        public ObservableCollection<Model> TotalLag { get; set; }
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -106,6 +107,7 @@ namespace Ideal
                     FillPaymentLists(db);
                     FillMonthSeries();
                     FillTotalProgress();
+                    FillTotalLag(db);
                     FillStatusValues();
                 }
                 catch (System.Data.SqlClient.SqlException e)
@@ -252,6 +254,26 @@ namespace Ideal
                 Units = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE)
             });
             TotalProgress.Add(new Model()
+            {
+                Item = "Collected",
+                Units = (int)Accounts.Sum(x => x.PAYMENTS)
+            });
+        }
+
+        /// <summary>
+        /// Fill the lag values for the running accounts
+        /// </summary>
+        /// <param name="db"></param>
+        private void FillTotalLag(IdealContext db)
+        {
+            TotalLag = new ObservableCollection<Model>();
+            TotalLag.Add(new Model()
+            {
+                Item = "Expected",
+                Units = (Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS) > 0) ?
+                            (int)(Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS)) : 0
+            });
+            TotalLag.Add(new Model()
             {
                 Item = "Collected",
                 Units = (int)Accounts.Sum(x => x.PAYMENTS)
