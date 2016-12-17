@@ -1,4 +1,4 @@
-IDEAL Furniture
+﻿IDEAL Furniture
 ===============
 
 IDEAL Furniture is a prototype Windows Desktop application that displays charts for a Furniture store.
@@ -17,6 +17,47 @@ Notes
 ### Menu of pages
 - Menu of pages is based on project  https://github.com/Microsoft/WPF-Samples Graphics/Brushes.
 
+### Connection to the database
+- Connection to Microsoft SQL Server 2016 is using ADO.NET Entity Framework
+  as described in Beginning C# 6.0 Programming with Visual Studio 2015.pdf book pj 670.
+
+  a) Add the Entity Framework using NuGet.
+     Go to Tools ➪ NuGet Package Manager ➪ Manage NuGetPackages for Solution.
+  b) In the NuGet Package Manager, choose the Entity Framework, 
+     uncheck the Include Prerelease checkbox and get the Entity Framework latest stable release. 
+	 Click the Install button. Click OK on the Preview Changes and the I Accept button for the 
+	 License Acceptance dialog.
+  c) Add a connection to the database
+     Project ➪ Add New Item. 
+	 Choose ADO.NET Entity Data Model in the Add New Item dialog and change the name from Model1 to IdealContext
+	 Code First from database -> New connection to ideal.dbo -> Select all Tables and Views. 
+	 This will generate classes for each item. 
+	 Create a folder 'DatabaseModel' and move all items there.
+
+    NOTES: To connect to SQL Server Express add a new connection using
+           .\sqlexpress in the server name the select ideal.db usign Windows Authentication.
+
+  d) Add the using libraries to the *.cs file
+     using System.Data.Entity;
+     using System.ComponentModel.DataAnnotations;
+ 
+
+- To handle DATABASE MIGRATIONS usign the Entity Framework.
+  "An unhandled exception of type 'System.InvalidOperationException' occurred in EntityFramework.dll
+   Additional information: The model backing the 'BookContext' has changed since the database was created.
+   Consider using Code First Migrations to update the database (http://go.microsoft.com/fwlink/?LinkId=238269)."
+
+  As the error message suggests, you need to add the Code First Migrations package to your program.
+  a) go to Tools ➪ NuGet Package Manager ➪ Package Manager Console
+  b) To enable automatic migration of your database to your updated class structure, enter this command
+     in the Package Manager Console at the PM> prompt:
+      Enable-Migrations –EnableAutomaticMigrations
+
+  This adds a Migrations class to your project. Migration/Configuration.cs
+  The Entity Framework will compare the timestamp of the database to your program and advise you
+  when the database is out of sync with your classes. To update the database, simply enter this command
+  in the Package Manager Console at the PM> prompt:
+    Update-Database
 
 
 
