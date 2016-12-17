@@ -48,6 +48,15 @@ namespace Ideal
     }
 
 
+    /// <summary>
+    /// Model for Total costs
+    /// </summary>
+    public class Model
+    {
+        public int? Units { get; set; }
+        public string Item { get; set; }
+    }
+
 
     /// <summary>
     ///  Series of data for the charts in *.xaml file
@@ -58,6 +67,7 @@ namespace Ideal
         public ObservableCollection<CostComparationModel> CostComparations { get; set; }
         public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
         public ObservableCollection<ItemModel> Months { get; set; }
+        public ObservableCollection<Model> TotalProgress { get; set; }
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -95,6 +105,7 @@ namespace Ideal
                     FillAccountSeries(db);
                     FillPaymentLists(db);
                     FillMonthSeries();
+                    FillTotalProgress();
                     FillStatusValues();
                 }
                 catch (System.Data.SqlClient.SqlException e)
@@ -230,6 +241,21 @@ namespace Ideal
                     });
                 }
             }
+        }
+
+        private void FillTotalProgress()
+        {
+            TotalProgress = new ObservableCollection<Model>();
+            TotalProgress.Add(new Model()
+            {
+                Item = "Balance",
+                Units = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE)
+            });
+            TotalProgress.Add(new Model()
+            {
+                Item = "Collected",
+                Units = (int)Accounts.Sum(x => x.PAYMENTS)
+            });
         }
 
         private void FillStatusValues()
