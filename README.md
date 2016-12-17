@@ -12,7 +12,7 @@ Notes
 ### Technology
 - The application was developed using Microsoft Visual Sudio Community 2015.
 - The application uses C# and Windows Presentation Fundation (WPF).
-- The database was developed using Microsoft SQL Server 2016 Express.
+- The database use Microsoft SQL Server 2016 Express or a local database.
 
 ### Menu of pages
 - Menu of pages is based on project  https://github.com/Microsoft/WPF-Samples Graphics/Brushes.

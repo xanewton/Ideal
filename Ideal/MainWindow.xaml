@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ideal"
         mc:Ignorable="d"
-        Title="IDEAL Furniture" Height="350" Width="525">
+        Title="IDEAL Furniture" 
+        Icon="/ViewResources/Graphicrating-Koloria-Chart-Bar-Document.ico" 
+        Height="350" Width="525">
 
     <Window.Resources>
         <HierarchicalDataTemplate x:Key="PagesDataTemplate"
