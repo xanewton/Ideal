@@ -32,6 +32,7 @@ Notes
 	 Choose ADO.NET Entity Data Model in the Add New Item dialog and change the name from Model1 to IdealContext
 	 Code First from database -> New connection to ideal.dbo -> Select all Tables and Views. 
 	 This will generate classes for each item. 
+	 Note that some Views will not be generated, but, this seems to be an EntityFramework error. Ignore it and continue.
 	 Create a folder 'DatabaseModel' and move all items there.
 
     NOTES: To connect to SQL Server Express add a new connection using

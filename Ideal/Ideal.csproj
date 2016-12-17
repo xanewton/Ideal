@@ -38,8 +38,19 @@
     <ApplicationIcon>ViewResources\Graphicrating-Koloria-Chart-Bar-Document.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -58,6 +69,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW.cs" />
+    <Compile Include="ACCOUNT_TBL.cs" />
+    <Compile Include="ADDRESS_TBL.cs" />
+    <Compile Include="CLIENT_TBL.cs" />
+    <Compile Include="EMPLOYEE_TBL.cs" />
+    <Compile Include="IdealContext.cs" />
+    <Compile Include="ITEM_TBL.cs" />
+    <Compile Include="PAYMENTS_VIEW.cs" />
+    <Compile Include="PAYMENT_MODE_TBL.cs" />
+    <Compile Include="PAYMENT_TBL.cs" />
+    <Compile Include="PROVIDER_TBL.cs" />
+    <Compile Include="REFERENCE_TBL.cs" />
+    <Compile Include="SCHEDULED_PAYMENT_TBL.cs" />
+    <Compile Include="TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
     <Compile Include="View\AccountDetailsPage.xaml.cs">
       <DependentUpon>AccountDetailsPage.xaml</DependentUpon>
     </Compile>
@@ -110,6 +135,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
