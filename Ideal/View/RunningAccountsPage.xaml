@@ -30,8 +30,62 @@
             <local:RunningAccountsViewModel />
         </DockPanel.DataContext>
 
-        <Label x:Name="label" Content="Running Accounts Page" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <!-- Label x:Name="label" Content="Running Accounts Page" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/ -->
 
+        <!-- Summary table-->
+        <Grid DockPanel.Dock="Top" Background="#00000000" Height="70">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="140" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontFamily="Segoe UI" FontSize="22" Foreground="#424242">Running Accounts</TextBlock>
+
+            <Border Grid.Column="1" >
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Green"
+                                            Style="{StaticResource AmountStyle}"
+                                            Text="{Binding PositiveAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Style="{StaticResource AmountTypeStyle}" Text="Collected" />
+                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"/>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+            <Border Grid.Column="2">
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"
+                                            Style="{StaticResource AmountStyle}"
+                                            Text="{Binding NegativeAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                    Style="{StaticResource AmountTypeStyle}" Text="Lag" />
+                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"/>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+            <Border Grid.Column="3">
+                <Viewbox Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Foreground="Orange" Style="{StaticResource AmountStyle}"
+                                            Text="{Binding BalanceAmount, StringFormat=c}" />
+                        </StackPanel>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Style="{StaticResource AmountTypeStyle}" Text="Balance" />
+                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"/>
+                    </StackPanel>
+                </Viewbox>
+            </Border>
+        </Grid>
+        
         <!-- Accounts table -->
         <DataGrid IsReadOnly="True"  DockPanel.Dock="Top" HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5"
                   HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" ItemsSource="{Binding Accounts}" 

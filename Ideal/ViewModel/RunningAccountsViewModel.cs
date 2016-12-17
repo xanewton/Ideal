@@ -44,6 +44,30 @@ namespace Ideal
         public ObservableCollection<CostComparationModel> CostComparations { get; set; }
         public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
 
+        private double _positiveAmount;
+        public double PositiveAmount
+        {
+            get { return _positiveAmount; }
+            set { _positiveAmount = value; }
+        }
+
+        private double _negativeAmount;
+        public double NegativeAmount
+        {
+            get { return _negativeAmount; }
+            set { _negativeAmount = value; }
+        }
+
+        private double _balanceAmount;
+        public double BalanceAmount
+        {
+            get { return _balanceAmount; }
+            set { _balanceAmount = value; }
+        }
+
+
+
+
         public RunningAccountsViewModel()
         {
             using (var db = new IdealContext())
@@ -52,6 +76,7 @@ namespace Ideal
                 {
                     db.Database.Connection.Open();
                     FillAccountSeries(db);
+                    FillStatusValues();
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -88,6 +113,14 @@ namespace Ideal
                         Expected = (double)acc.SUM_SCHEDULED_PAYMENTS
                     });
             }
+        }
+
+        private void FillStatusValues()
+        {
+            PositiveAmount = (int)Accounts.Sum(x => x.PAYMENTS); // Collected
+            NegativeAmount = (Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS) > 0) ?
+                                (int)(Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS)) : 0; //Lag
+            BalanceAmount = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE); //Balance
         }
 
     }
