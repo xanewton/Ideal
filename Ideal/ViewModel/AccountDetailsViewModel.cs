@@ -35,6 +35,7 @@ namespace Ideal
         public ObservableCollection<DetailModel> Details { get; set; }
         public ObservableCollection<Model> Totals { get; set; }
         public ObservableCollection<PaymentModel> Payments { get; set; }
+        public ObservableCollection<Model> TotalProgress { get; set; }
 
 
         private List<PAYMENT_TBL> listPayments;
@@ -118,9 +119,9 @@ namespace Ideal
                         {
                             db.Database.Connection.Open();
                             FillPayments(db, selectedItemAccountID);
-
                             FillDetails(selectedItemAccountID);
                             FillStatusValues(selectedItemAccountID);
+                            FillTotalProgress(selectedItemAccountID);
                         }
                         catch (System.Data.SqlClient.SqlException e)
                         {
@@ -149,6 +150,7 @@ namespace Ideal
                     FillPayments(db, selectedItemAccountID);
                     FillDetails(selectedItemAccountID);
                     FillStatusValues(selectedItemAccountID);
+                    FillTotalProgress(selectedItemAccountID);
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -245,5 +247,19 @@ namespace Ideal
         }
 
 
+        private void FillTotalProgress(string accountId)
+        {
+            //Calculate account information
+            var acc = Accounts.Where(x => x.ACC_ID == accountId).First();
+            if (acc == null) { return; }
+            TotalProgress = new ObservableCollection<Model>();
+            TotalProgress.Add(new Model()
+            {
+                Item = "Balance",
+                Units = (int)acc.CALCULATED_CURRENT_BALANCE
+            });
+            TotalProgress.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
+            RaisePropertyChanged("TotalProgress");
+        }
     }
 }
