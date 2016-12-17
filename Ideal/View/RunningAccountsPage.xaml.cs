@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ideal.View
+namespace Ideal
 {
     /// <summary>
     /// Interaction logic for RunningAccountsPage.xaml
