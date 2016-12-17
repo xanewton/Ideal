@@ -268,6 +268,37 @@
 
         </Grid>
 
+        
+        <!-- Week chart-->
+        <chart:SfChart DockPanel.Dock="Top" SideBySideSeriesPlacement="False" AreaBorderThickness="0,1,1,0" HorizontalAlignment="Center" Margin="2">
+            <chart:SfChart.Header>
+                <TextBlock FontSize="15" FontFamily="Segoe UI" Foreground="Black"
+                           Margin="0,0,0,20">Week Revenue</TextBlock>
+            </chart:SfChart.Header>
+            <chart:SfChart.PrimaryAxis>
+                <chart:CategoryAxis  PlotOffset="30" FontSize="9" LabelsIntersectAction="MultipleRows"/>
+            </chart:SfChart.PrimaryAxis>
+            <chart:SfChart.SecondaryAxis>
+                <chart:NumericalAxis Header="Money" FontSize="12" />
+            </chart:SfChart.SecondaryAxis>
+            <chart:SfChart.Legend>
+                <chart:ChartLegend Visibility="Visible"/>
+            </chart:SfChart.Legend>
+            <chart:SfChart.Behaviors>
+                <chart:ChartZoomPanBehavior EnableZoomingToolBar="True" ToolBarItemHeight="15" 
+                                              ToolBarItemWidth="15" ToolBarBackground="#00000000" 
+                                              ToolBarItems="All" ToolBarItemMargin="0"/>
+            </chart:SfChart.Behaviors>
+
+            <chart:ColumnSeries EnableAnimation="True" Label="Expected"
+                              ItemsSource="{Binding Weeks}" XBindingPath="Item" YBindingPath="Expected" 
+                              ShowTooltip="True" Stroke="#FFbcbcbc" Interior="#99bcbcbc" StrokeThickness="2" />
+            <chart:ColumnSeries EnableAnimation="True" Label="Collected" SegmentSpacing="0.5"
+                              ItemsSource="{Binding Weeks}" XBindingPath="Item" YBindingPath="Collected" 
+                              ShowTooltip="True" Stroke="#FF0000FF" Interior="#990000FF" StrokeThickness="2" />
+        </chart:SfChart>
+        
+        
         <!-- Accounts table -->
         <DataGrid IsReadOnly="True"  DockPanel.Dock="Top" HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5"
                   HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" ItemsSource="{Binding Accounts}" 

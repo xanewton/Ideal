@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,6 +71,7 @@ namespace Ideal
         public ObservableCollection<Model> TotalProgress { get; set; }
         public ObservableCollection<Model> TotalLag { get; set; }
         public ObservableCollection<Model> Totals { get; set; } // Represent the running account totals
+        public ObservableCollection<ItemModel> Weeks { get; set; }
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -107,6 +109,7 @@ namespace Ideal
                     FillAccountSeries(db);
                     FillPaymentLists(db);
                     FillMonthSeries();
+                    FillWeekSeries();
                     FillTotalProgress();
                     FillTotalLag(db);
                     FillStatusValues();
@@ -309,6 +312,120 @@ namespace Ideal
                 Totals.Add(new Model() { Item = description, Units = (int)t.VALUE });
             }
         }
+
+        /// <summary>
+        /// Query the lists and fill the Week series.
+        /// NOTE: DataEntity didn't generate all views from db (3 views missing).
+        /// </summary>
+        private void FillWeekSeries()
+        {
+            List<ItemModel> listWeek = new List<ItemModel>();
+            CalculateScheduledWeekPayments(listWeek);
+            CalculateWeekPayments(listWeek);
+
+            // Add to the Observable list
+            Weeks = new ObservableCollection<ItemModel>();
+            foreach (var item in listWeek)
+                Weeks.Add(item);
+        }
+
+        private void CalculateScheduledWeekPayments(List<ItemModel> listWeek)
+        {
+            var result = from k in listScheduledPay // work around: group by doest work with table
+                         group k by new
+                         {
+                             y = k.SCHPAY_DATE.Year,
+                             w = WeekOfYearISO8601(k.SCHPAY_DATE)
+                         } into g
+                         select new
+                         {
+                             Year = g.Key.y,
+                             Week = g.Key.w,
+                             FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
+                             //LastWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture).AddDays(6),
+                             Sum = g.Sum(p => p.SCHPAY_AMOUNT)
+                         };
+
+            // DateTime firstDayOfWeek= FirstDateOfWeek(2013, thisWeekNumber, CultureInfo.CurrentCulture);
+
+            foreach (var p in result)
+            {
+                listWeek.Add(new ItemModel() // Add all items
+                {
+                    //Item = p.Year.ToString() + "-" + p.Week.ToString() +  p.FirstWeekDay,
+                    Item = String.Format("{0} {1:MMMdd}", p.Year, p.FirstWeekDay),
+                    Expected = (int)p.Sum,
+                    Collected = null
+                });
+            }
+        }
+
+        /// <summary>
+        /// Calculate the week number based on a given date.
+        /// Source: http://stackoverflow.com/questions/1497586/how-can-i-calculate-find-the-week-number-of-a-given-date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static int WeekOfYearISO8601(DateTime date)
+        {
+            var day = (int)CultureInfo.CurrentCulture.Calendar.GetDayOfWeek(date);
+            return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(4 - (day == 0 ? 7 : day)),
+                CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
+
+
+
+        // Source http://stackoverflow.com/questions/19901666/get-date-of-first-and-last-day-of-week-knowing-week-number
+        public static DateTime FirstDateOfWeek(int year, int weekOfYear, System.Globalization.CultureInfo ci)
+        {
+            DateTime jan1 = new DateTime(year, 1, 1);
+            int daysOffset = (int)ci.DateTimeFormat.FirstDayOfWeek - (int)jan1.DayOfWeek;
+            DateTime firstWeekDay = jan1.AddDays(daysOffset);
+            int firstWeek = ci.Calendar.GetWeekOfYear(jan1, ci.DateTimeFormat.CalendarWeekRule, ci.DateTimeFormat.FirstDayOfWeek);
+            if ((firstWeek <= 1 || firstWeek >= 52) && daysOffset >= -3)
+            {
+                weekOfYear -= 1;
+            }
+            return firstWeekDay.AddDays(weekOfYear * 7);
+        }
+
+
+        private void CalculateWeekPayments(List<ItemModel> listWeek)
+        {
+            var result = from r in listPayments  // work around: group by doest work with table
+                         group r by new
+                         {
+                             y = r.PAY_DATE.Year,
+                             w = WeekOfYearISO8601(r.PAY_DATE)
+                         } into g
+                         select new
+                         {
+                             Year = g.Key.y,
+                             Week = g.Key.w,
+                             FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
+                             //LastWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture).AddDays(6),
+                             Sum = g.Sum(p => p.PAY_AMOUNT)
+                         };
+            foreach (var p in result)
+            {
+                string str = String.Format("{0} {1:MMMdd}", p.Year, p.FirstWeekDay);
+                ItemModel month = listWeek.Find(x => x.Item.Equals(str));
+                if (month != null)
+                {
+                    month.Collected = (int)p.Sum;
+                }
+                else
+                {
+                    listWeek.Add(new ItemModel() // Add item
+                    {
+                        Item = str,
+                        Expected = null,
+                        Collected = (int)p.Sum
+                    });
+                }
+            }
+        }
+
 
     }
 }
