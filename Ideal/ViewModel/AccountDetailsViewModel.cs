@@ -36,6 +36,7 @@ namespace Ideal
         public ObservableCollection<Model> Totals { get; set; }
         public ObservableCollection<PaymentModel> Payments { get; set; }
         public ObservableCollection<Model> TotalProgress { get; set; }
+        public ObservableCollection<Model> TotalLag { get; set; }
 
 
         private List<PAYMENT_TBL> listPayments;
@@ -122,6 +123,7 @@ namespace Ideal
                             FillDetails(selectedItemAccountID);
                             FillStatusValues(selectedItemAccountID);
                             FillTotalProgress(selectedItemAccountID);
+                            FillTotalLag(selectedItemAccountID);
                         }
                         catch (System.Data.SqlClient.SqlException e)
                         {
@@ -151,6 +153,7 @@ namespace Ideal
                     FillDetails(selectedItemAccountID);
                     FillStatusValues(selectedItemAccountID);
                     FillTotalProgress(selectedItemAccountID);
+                    FillTotalLag(selectedItemAccountID);
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -260,6 +263,22 @@ namespace Ideal
             });
             TotalProgress.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
             RaisePropertyChanged("TotalProgress");
+        }
+
+        private void FillTotalLag(string accountId)
+        {
+            //Calculate account information
+            var acc = Accounts.Where(x => x.ACC_ID == accountId).First();
+            if (acc == null) { return; }
+            TotalLag = new ObservableCollection<Model>();
+            TotalLag.Add(new Model()
+            {
+                Item = "Expected",
+                Units = (acc.SUM_SCHEDULED_PAYMENTS - acc.PAYMENTS > 0) ?
+                            (int)(acc.SUM_SCHEDULED_PAYMENTS - acc.PAYMENTS) : 0
+            });
+            TotalLag.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
+            RaisePropertyChanged("TotalLag");
         }
     }
 }
