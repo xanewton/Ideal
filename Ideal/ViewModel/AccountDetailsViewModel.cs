@@ -18,6 +18,13 @@ namespace Ideal
         public Nullable<int> PAY_VISITS { get; set; }
     }
 
+    public class ScheduledPaymentModel
+    {
+        public string ACC_ID { get; set; }
+        public string SCHPAY_DATE { get; set; }
+        public decimal SCHPAY_AMOUNT { get; set; }
+    }
+
     public class DetailModel
     {
         public string Item { get; set; }
@@ -35,11 +42,14 @@ namespace Ideal
         public ObservableCollection<DetailModel> Details { get; set; }
         public ObservableCollection<Model> Totals { get; set; } // Total chart
         public ObservableCollection<PaymentModel> Payments { get; set; }
+        public ObservableCollection<ScheduledPaymentModel> SchPayments { get; set; }
         public ObservableCollection<Model> TotalProgress { get; set; } // Progress chart
         public ObservableCollection<Model> TotalLag { get; set; }  //Lag chart
+        public ObservableCollection<ItemModel> PaymentComparation { get; set; } // Payment comparation chart
 
 
         private List<PAYMENT_TBL> listPayments;
+        private List<SCHEDULED_PAYMENT_TBL> listSchPayments;
 
         private double _positiveAmount;
         public double PositiveAmount
@@ -120,11 +130,13 @@ namespace Ideal
                         {
                             db.Database.Connection.Open();
                             FillPayments(db, selectedItemAccountID);
+                            FillSchPayments(db, selectedItemAccountID);
                             FillDetails(selectedItemAccountID);
                             FillStatusValues(selectedItemAccountID);
                             FillTotalProgress(selectedItemAccountID);
                             FillTotalLag(selectedItemAccountID);
                             FillTotals(selectedItemAccountID);
+                            FillPaymentComparationSeries(selectedItemAccountID);
                         }
                         catch (System.Data.SqlClient.SqlException e)
                         {
@@ -151,11 +163,13 @@ namespace Ideal
                     FillAccounts(db);
                     selectedItemAccountID = AccountIDs.ElementAt(0);
                     FillPayments(db, selectedItemAccountID);
+                    FillSchPayments(db, selectedItemAccountID);
                     FillDetails(selectedItemAccountID);
                     FillStatusValues(selectedItemAccountID);
                     FillTotalProgress(selectedItemAccountID);
                     FillTotalLag(selectedItemAccountID);
                     FillTotals(selectedItemAccountID);
+                    FillPaymentComparationSeries(selectedItemAccountID);
                 }
                 catch (System.Data.SqlClient.SqlException e)
                 {
@@ -191,6 +205,33 @@ namespace Ideal
                 });
             }
             RaisePropertyChanged("Payments");
+        }
+
+        /// <summary>
+        /// Fill SchPayments with the accountID element.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="accountId"></param>
+        private void FillSchPayments(IdealContext db, string accountId)
+        {
+            var query = from pay in db.SCHEDULED_PAYMENT_TBL
+                        where pay.ACC_ID == accountId
+                        orderby pay.SCHPAY_DATE
+                        select pay;
+            if (!query.Any()) { return; }
+            listSchPayments = new List<SCHEDULED_PAYMENT_TBL>();
+            SchPayments = new ObservableCollection<ScheduledPaymentModel>();
+            foreach (var r in query)
+            {
+                listSchPayments.Add(r);
+                SchPayments.Add(new ScheduledPaymentModel()
+                {
+                    ACC_ID = r.ACC_ID,
+                    SCHPAY_DATE = String.Format("{0:ddd MMM dd, yyyy}", r.SCHPAY_DATE),
+                    SCHPAY_AMOUNT = r.SCHPAY_AMOUNT
+                });
+            }
+            RaisePropertyChanged("SchPayments");
         }
 
         /// <summary>
@@ -298,6 +339,50 @@ namespace Ideal
             Totals.Add(new Model() { Item = "Invested", Units = (int)acc.ITEM_BUY_PRICE });
             Totals.Add(new Model() { Item = "Collected", Units = (int)acc.PAYMENTS });
             RaisePropertyChanged("Totals");
+        }
+
+        private void FillPaymentComparationSeries(string accountId)
+        {
+            PaymentComparation = new ObservableCollection<ItemModel>();
+            // Iterate in the payments list and add the sum of payments to the collected section
+            TimeSpan period = listSchPayments.ElementAt(1).SCHPAY_DATE - listSchPayments.ElementAt(0).SCHPAY_DATE;
+            for (int i = 0; i < listSchPayments.Count; i++)
+            {
+                DateTime minDate = listSchPayments.ElementAt(i).SCHPAY_DATE;
+                DateTime maxDate = minDate + period;
+                if (i == 0)
+                    minDate = minDate - period - period;
+                var sumPay = from p in listPayments
+                             where (p.PAY_DATE < maxDate && p.PAY_DATE >= minDate)
+                             group p by p.PAY_DATE into g
+                             select g.Sum(p => p.PAY_AMOUNT);
+                int? collected = null;
+                if (sumPay != null && sumPay.Any())
+                    collected = (int)sumPay.ElementAt(0);
+
+                // Add item to the list
+                PaymentComparation.Add(new ItemModel()
+                {
+                    Item = String.Format("{0:MMM dd, yyyy}", listSchPayments.ElementAt(i).SCHPAY_DATE),
+                    Expected = (int)listSchPayments.ElementAt(i).SCHPAY_AMOUNT,
+                    Collected = collected
+                });
+            }
+
+            // Query the payments after the scheduled date
+            var query = from p in listPayments
+                        where (p.PAY_DATE > listSchPayments.Last().SCHPAY_DATE + period)
+                        select p;
+            foreach (var r in query)
+            {
+                PaymentComparation.Add(new ItemModel()
+                {
+                    Item = String.Format("{0:MMM dd, yyyy}", r.PAY_DATE),
+                    Expected = null,
+                    Collected = (int)r.PAY_AMOUNT
+                });
+            }
+            RaisePropertyChanged("PaymentComparation");
         }
     }
 }

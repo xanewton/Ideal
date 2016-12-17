@@ -232,5 +232,36 @@
             </chart:SfChart>
         </Grid>
 
+        <!-- Payments chart-->
+        <chart:SfChart DockPanel.Dock="Top" SideBySideSeriesPlacement="False" AreaBorderThickness="0,1,1,0" 
+                       HorizontalAlignment="Center" Margin="2">
+            <chart:SfChart.Header>
+                <TextBlock FontSize="15" FontFamily="Segoe UI" Foreground="Black"
+                           Margin="0,0,0,20">Payments</TextBlock>
+            </chart:SfChart.Header>
+            <chart:SfChart.PrimaryAxis>
+                <chart:CategoryAxis   FontSize="9" LabelRotationAngle="-90" />
+            </chart:SfChart.PrimaryAxis>
+            <chart:SfChart.SecondaryAxis>
+                <chart:NumericalAxis Header="Money" FontSize="12" />
+            </chart:SfChart.SecondaryAxis>
+            <chart:SfChart.Legend>
+                <chart:ChartLegend Visibility="Visible"/>
+            </chart:SfChart.Legend>
+            <chart:SfChart.Behaviors>
+                <chart:ChartZoomPanBehavior EnableZoomingToolBar="True" ToolBarItemHeight="15" 
+                                              ToolBarItemWidth="15" ToolBarBackground="#00000000" 
+                                              ToolBarItems="All" ToolBarItemMargin="0"/>
+            </chart:SfChart.Behaviors>
+
+            <chart:ColumnSeries EnableAnimation="True" Label="Expected"
+                              ItemsSource="{Binding PaymentComparation}" XBindingPath="Item" YBindingPath="Expected" 
+                              ShowTooltip="True" Stroke="#FFbcbcbc" Interior="#99bcbcbc" StrokeThickness="2" />
+            <chart:ColumnSeries EnableAnimation="True" Label="Collected" SegmentSpacing="0.5"
+                              ItemsSource="{Binding PaymentComparation}" XBindingPath="Item" YBindingPath="Collected" 
+                              ShowTooltip="True" Stroke="#FF0000FF" Interior="#990000FF" StrokeThickness="2" />
+        </chart:SfChart>
+
+
     </DockPanel>
 </Page>
