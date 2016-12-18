@@ -262,6 +262,23 @@
                               ShowTooltip="True" Stroke="#FF0000FF" Interior="#990000FF" StrokeThickness="2" />
         </chart:SfChart>
 
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
+            <!-- Expected payments table -->
+            <DataGrid IsReadOnly="True" Grid.Column="0" ItemsSource="{Binding SchPayments}"
+                      HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" 
+                      HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5" 
+                      AlternationCount="2" AlternatingRowBackground="#FFFBFBFB"/>
+
+            <!-- Payments table -->
+            <DataGrid IsReadOnly="True" Grid.Column="1" ItemsSource="{Binding Payments}"
+                      HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" 
+                      HorizontalGridLinesBrush="#FFF5F5F5" VerticalGridLinesBrush="#FFF5F5F5"
+                      AlternationCount="2" AlternatingRowBackground="#FFFBFBFB" />
+        </Grid>
     </DockPanel>
 </Page>
