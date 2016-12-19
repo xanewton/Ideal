@@ -67,6 +67,11 @@ Notes
   in the Package Manager Console at the  PM> prompt:  Update-Database
 ```
 
+### Testing database
+The structure of the expected databse is similar to the Testing database [TestingDatabase01.mdf].
+The database contains some sample records.
+
+
 ### SyncFussion charts
 - Install SyncFussion
   1. Go to https://www.syncfusion.com/products/communitylicense and register.
