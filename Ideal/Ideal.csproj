@@ -175,12 +175,12 @@
     <Resource Include="ViewResources\Graphicrating-Koloria-Chart-Bar-Document.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestingDatabase01.mdf">
+    <Content Include="SampleDatabase.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestingDatabase01_log.ldf">
+    <Content Include="SampleDatabase_log.ldf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>TestingDatabase01.mdf</DependentUpon>
+      <DependentUpon>SampleDatabase.mdf</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup>

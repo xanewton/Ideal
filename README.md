@@ -68,7 +68,7 @@ Notes
 ```
 
 ### Testing database
-The structure of the expected databse is similar to the Testing database [TestingDatabase01.mdf].
+The structure of the expected databse is similar to the Testing database [SampleDatabase.mdf].
 The database contains some sample records.
 
 
