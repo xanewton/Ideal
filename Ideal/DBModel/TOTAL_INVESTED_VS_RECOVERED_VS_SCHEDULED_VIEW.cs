@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #endregion
-namespace Ideal
+namespace Ideal.DBModel
 {
     using System;
     using System.Collections.Generic;
