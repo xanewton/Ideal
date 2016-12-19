@@ -85,6 +85,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SampleDBModel\ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW.cs" />
+    <Compile Include="SampleDBModel\ACCOUNT_TBL.cs" />
+    <Compile Include="SampleDBModel\ADDRESS_TBL.cs" />
+    <Compile Include="SampleDBModel\CLIENT_TBL.cs" />
     <Compile Include="DBModel\ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW.cs" />
     <Compile Include="DBModel\ACCOUNT_TBL.cs" />
     <Compile Include="DBModel\ADDRESS_TBL.cs" />
@@ -99,6 +103,16 @@
     <Compile Include="DBModel\REFERENCE_TBL.cs" />
     <Compile Include="DBModel\SCHEDULED_PAYMENT_TBL.cs" />
     <Compile Include="DBModel\TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
+    <Compile Include="SampleDBModel\EMPLOYEE_TBL.cs" />
+    <Compile Include="SampleDBModel\ITEM_TBL.cs" />
+    <Compile Include="SampleDBModel\PAYMENTS_VIEW.cs" />
+    <Compile Include="SampleDBModel\PAYMENT_MODE_TBL.cs" />
+    <Compile Include="SampleDBModel\PAYMENT_TBL.cs" />
+    <Compile Include="SampleDBModel\PROVIDER_TBL.cs" />
+    <Compile Include="SampleDBModel\REFERENCE_TBL.cs" />
+    <Compile Include="SampleDBModel\SampleModel.cs" />
+    <Compile Include="SampleDBModel\SCHEDULED_PAYMENT_TBL.cs" />
+    <Compile Include="SampleDBModel\TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW.cs" />
     <Compile Include="ViewModel\AccountDetailsViewModel.cs" />
     <Compile Include="ViewModel\RunningAccountsViewModel.cs" />
     <Compile Include="View\AccountDetailsPage.xaml.cs">
