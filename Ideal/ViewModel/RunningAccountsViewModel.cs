@@ -16,8 +16,6 @@
  */
 #endregion
 
-#define USE_SAMPLE_DB
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

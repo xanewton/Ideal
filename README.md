@@ -68,8 +68,11 @@ Notes
 ```
 
 ### Testing database
-The structure of the expected databse is similar to the Testing database [SampleDatabase.mdf].
-The database contains some sample records.
+- The structure of the expected databse is similar to the Testing database [SampleDatabase.mdf].
+  The database contains some sample records.
+- To enable the SampleDatabase. Add USE_SAMPLE_DB preprocessor to the *.csproj file:
+  a) Select the Ideal solution, go to Project ➪ Ideal Propierties ... ➪ Buil tab ➪ General section
+  b) Add USE_SAMPLE_DB to Conditional Compilation Symbol
 
 
 ### SyncFussion charts
