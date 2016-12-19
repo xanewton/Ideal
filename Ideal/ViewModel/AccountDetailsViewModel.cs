@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 #endregion
+
+#define USE_SAMPLE_DB
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +26,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+
+#if USE_SAMPLE_DB
+using Ideal.SampleDBModel;
+#else
 using Ideal.DBModel;
+#endif
 
 namespace Ideal
 {
@@ -142,7 +150,11 @@ namespace Ideal
                 {
                     selectedItemAccountID = value;
                     RaisePropertyChanged("SelectedItemAccountID");
+#if USE_SAMPLE_DB
+                    using (var db = new SampleModel())
+#else
                     using (var db = new IdealContext())
+#endif
                     {
                         try
                         {
@@ -173,7 +185,11 @@ namespace Ideal
         /// </summary>
         public AccountDetailsViewModel()
         {
+#if USE_SAMPLE_DB
+            using (var db = new SampleModel())
+#else
             using (var db = new IdealContext())
+#endif
             {
                 try
                 {
@@ -202,7 +218,11 @@ namespace Ideal
         /// </summary>
         /// <param name="db"></param>
         /// <param name="accountId"></param>
+#if USE_SAMPLE_DB
+        public void FillPayments(SampleModel db, string accountId)
+#else
         public void FillPayments(IdealContext db, string accountId)
+#endif
         {
             var query = from pay in db.PAYMENT_TBL
                         where pay.ACC_ID == accountId
@@ -230,7 +250,11 @@ namespace Ideal
         /// </summary>
         /// <param name="db"></param>
         /// <param name="accountId"></param>
+#if USE_SAMPLE_DB
+        private void FillSchPayments(SampleModel db, string accountId)
+#else
         private void FillSchPayments(IdealContext db, string accountId)
+#endif
         {
             var query = from pay in db.SCHEDULED_PAYMENT_TBL
                         where pay.ACC_ID == accountId
@@ -256,7 +280,11 @@ namespace Ideal
         /// Fill the account list and accountIDs list
         /// </summary>
         /// <param name="db"></param>
+#if USE_SAMPLE_DB
+        private void FillAccounts(SampleModel db)
+#else
         private void FillAccounts(IdealContext db)
+#endif
         {
             var query = from account in db.ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW
                         orderby account.ACC_ID

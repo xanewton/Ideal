@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 #endregion
+
+#define USE_SAMPLE_DB
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +26,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+
+#if USE_SAMPLE_DB
+using Ideal.SampleDBModel;
+#else
 using Ideal.DBModel;
+#endif
 
 namespace Ideal
 {
@@ -102,7 +110,11 @@ namespace Ideal
 
         public RunningAccountsViewModel()
         {
+#if USE_SAMPLE_DB
+            using (var db = new SampleModel())
+#else
             using (var db = new IdealContext())
+#endif
             {
                 try
                 {
@@ -128,7 +140,11 @@ namespace Ideal
         /// <summary>
         /// Query the Accounts view and fill Accounts and CostComparations series.
         /// </summary>
+#if USE_SAMPLE_DB
+        private void FillAccountSeries(SampleModel db)
+#else
         private void FillAccountSeries(IdealContext db)
+#endif
         {
             var query = from account in db.ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW
                         orderby account.ACC_ID
@@ -157,7 +173,11 @@ namespace Ideal
         /// Store tables in temporal Lists to allow LINQ grouping queries.
         /// </summary>
         /// <param name="db"></param>
+#if USE_SAMPLE_DB
+        private void FillPaymentLists(SampleModel db)
+#else
         private void FillPaymentLists(IdealContext db)
+#endif
         {
             // Get Scheduled Payments table
             listScheduledPay = new List<SCHEDULED_PAYMENT_TBL>();
@@ -270,7 +290,11 @@ namespace Ideal
         /// Fill the lag values for the running accounts
         /// </summary>
         /// <param name="db"></param>
+#if USE_SAMPLE_DB
+        private void FillTotalLag(SampleModel db)
+#else
         private void FillTotalLag(IdealContext db)
+#endif
         {
             TotalLag = new ObservableCollection<Model>();
             TotalLag.Add(new Model()
@@ -298,7 +322,11 @@ namespace Ideal
         /// Fill the totals values for all accounts
         /// </summary>
         /// <param name="db"></param>
+#if USE_SAMPLE_DB
+        private void FillTotals(SampleModel db)
+#else
         private void FillTotals(IdealContext db)
+#endif
         {
             Totals = new ObservableCollection<Model>();
             var result = from r in db.TOTAL_INVESTED_VS_RECOVERED_VS_SCHEDULED_VIEW
