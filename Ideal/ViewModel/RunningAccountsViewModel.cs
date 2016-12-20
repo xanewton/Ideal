@@ -101,11 +101,12 @@ namespace Ideal
             set { _balanceAmount = value; }
         }
 
-        // Private list to save content of tables
-        private List<SCHEDULED_PAYMENT_TBL> listScheduledPay;
-        private List<PAYMENT_TBL> listPayments;
+        // Helper for making calculations
+        RunningAccountsHelper util = new RunningAccountsHelper();
 
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public RunningAccountsViewModel()
         {
 #if USE_SAMPLE_DB
@@ -118,7 +119,7 @@ namespace Ideal
                 {
                     db.Database.Connection.Open();
                     FillAccountSeries(db);
-                    FillPaymentLists(db);
+                    util.FillPaymentLists(db);
                     FillMonthSeries();
                     FillWeekSeries();
                     FillTotalProgress();
@@ -167,34 +168,6 @@ namespace Ideal
             }
         }
 
-        /// <summary>
-        /// Store tables in temporal Lists to allow LINQ grouping queries.
-        /// </summary>
-        /// <param name="db"></param>
-#if USE_SAMPLE_DB
-        private void FillPaymentLists(SampleModel db)
-#else
-        private void FillPaymentLists(IdealContext db)
-#endif
-        {
-            // Get Scheduled Payments table
-            listScheduledPay = new List<SCHEDULED_PAYMENT_TBL>();
-            var queryScheduledPay = from p in db.SCHEDULED_PAYMENT_TBL
-                                    select p;
-            foreach (var p in queryScheduledPay)
-            {
-                listScheduledPay.Add(p);
-            }
-
-            // Get Payments table
-            listPayments = new List<PAYMENT_TBL>();
-            var queryPayments = from p in db.PAYMENT_TBL
-                                select p;
-            foreach (var p in queryPayments)
-            {
-                listPayments.Add(p);
-            }
-        }
 
         /// <summary>
         /// Query the lists and fill the series.
@@ -203,8 +176,8 @@ namespace Ideal
         private void FillMonthSeries()
         {
             List<ItemModel> listMonth = new List<ItemModel>();
-            CalculateScheduledMonthPayments(listMonth);
-            CalculateMonthPayments(listMonth);
+            util.CalculateScheduledMonthPayments(listMonth);
+            util.CalculateMonthPayments(listMonth);
 
             // Add to the Observable list
             Months = new ObservableCollection<ItemModel>();
@@ -212,63 +185,7 @@ namespace Ideal
                 Months.Add(item);
         }
 
-        private void CalculateScheduledMonthPayments(List<ItemModel> listMonth)
-        {
-            var result = from k in listScheduledPay // work around: group by doest work with table
-                         group k by new
-                         {
-                             y = k.SCHPAY_DATE.Year,
-                             m = k.SCHPAY_DATE.Month
-                         } into g
-                         select new
-                         {
-                             Month = new DateTime(g.Key.y, g.Key.m, 1),
-                             Sum = g.Sum(p => p.SCHPAY_AMOUNT)
-                         };
-            foreach (var p in result)
-            {
-                listMonth.Add(new ItemModel() // Add all items
-                {
-                    Item = p.Month.ToString("yyyy MMM"),
-                    Expected = (int)p.Sum,
-                    Collected = null
-                });
-            }
-        }
-
-        private void CalculateMonthPayments(List<ItemModel> listMonth)
-        {
-            var result = from r in listPayments  // work around: group by doest work with table
-                         group r by new
-                         {
-                             y = r.PAY_DATE.Year,
-                             m = r.PAY_DATE.Month
-                         } into g
-                         select new
-                         {
-                             Month = new DateTime(g.Key.y, g.Key.m, 1),
-                             Sum = g.Sum(p => p.PAY_AMOUNT)
-                         };
-            foreach (var p in result)
-            {
-                string str = p.Month.ToString("yyyy MMM");
-                ItemModel month = listMonth.Find(x => x.Item.Equals(str));
-                if (month != null)
-                {
-                    month.Collected = (int)p.Sum;
-                }
-                else
-                {
-                    listMonth.Add(new ItemModel() // Add item
-                    {
-                        Item = str,
-                        Expected = null,
-                        Collected = (int)p.Sum
-                    });
-                }
-            }
-        }
-
+        
         private void FillTotalProgress()
         {
             TotalProgress = new ObservableCollection<Model>();
@@ -347,40 +264,80 @@ namespace Ideal
         private void FillWeekSeries()
         {
             List<ItemModel> listWeek = new List<ItemModel>();
-            CalculateScheduledWeekPayments(listWeek);
-            CalculateWeekPayments(listWeek);
+            util.CalculateScheduledWeekPayments(listWeek);
+            util.CalculateWeekPayments(listWeek);
 
             // Add to the Observable list
             Weeks = new ObservableCollection<ItemModel>();
             foreach (var item in listWeek)
                 Weeks.Add(item);
         }
+    }
 
-        private void CalculateScheduledWeekPayments(List<ItemModel> listWeek)
+
+
+    /// <summary>
+    /// Helper class for the RunningAccountsViewModel
+    /// </summary>
+    public class RunningAccountsHelper
+    {
+
+        // Private list to save content of tables
+        private List<SCHEDULED_PAYMENT_TBL> listScheduledPay;
+        private List<PAYMENT_TBL> listPayments;
+
+
+        /// <summary>
+        /// Store tables in temporal Lists to allow LINQ grouping queries.
+        /// </summary>
+        /// <param name="db"></param>
+#if USE_SAMPLE_DB
+        public void FillPaymentLists(SampleModel db)
+#else
+        public void FillPaymentLists(IdealContext db)
+#endif
         {
-            var result = from k in listScheduledPay // work around: group by doest work with table
+            // Get Scheduled Payments table
+            listScheduledPay = new List<SCHEDULED_PAYMENT_TBL>();
+            var queryScheduledPay = from p in db.SCHEDULED_PAYMENT_TBL
+                                    select p;
+            foreach (var p in queryScheduledPay)
+            {
+                listScheduledPay.Add(p);
+            }
+
+            // Get Payments table
+            listPayments = new List<PAYMENT_TBL>();
+            var queryPayments = from p in db.PAYMENT_TBL
+                                select p;
+            foreach (var p in queryPayments)
+            {
+                listPayments.Add(p);
+            }
+        }
+
+        /// <summary>
+        /// Generates a list of scheduled month payments.
+        /// </summary>
+        /// <param name="listMonth"></param> The generated list
+        public void CalculateScheduledMonthPayments(List<ItemModel> listMonth)
+        {
+            var result = from k in listScheduledPay // work around: group by doesn't work with table
                          group k by new
                          {
                              y = k.SCHPAY_DATE.Year,
-                             w = WeekOfYearISO8601(k.SCHPAY_DATE)
+                             m = k.SCHPAY_DATE.Month
                          } into g
                          select new
                          {
-                             Year = g.Key.y,
-                             Week = g.Key.w,
-                             FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
-                             //LastWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture).AddDays(6),
+                             Month = new DateTime(g.Key.y, g.Key.m, 1),
                              Sum = g.Sum(p => p.SCHPAY_AMOUNT)
                          };
-
-            // DateTime firstDayOfWeek= FirstDateOfWeek(2013, thisWeekNumber, CultureInfo.CurrentCulture);
-
             foreach (var p in result)
             {
-                listWeek.Add(new ItemModel() // Add all items
+                listMonth.Add(new ItemModel() // Add all items
                 {
-                    //Item = p.Year.ToString() + "-" + p.Week.ToString() +  p.FirstWeekDay,
-                    Item = String.Format("{0} {1:MMMdd}", p.Year, p.FirstWeekDay),
+                    Item = p.Month.ToString("yyyy MMM"),
                     Expected = (int)p.Sum,
                     Collected = null
                 });
@@ -388,38 +345,49 @@ namespace Ideal
         }
 
         /// <summary>
-        /// Calculate the week number based on a given date.
-        /// Source: http://stackoverflow.com/questions/1497586/how-can-i-calculate-find-the-week-number-of-a-given-date
+        /// Generates a list of the month payments.
         /// </summary>
-        /// <param name="date"></param>
-        /// <returns></returns>
-        public static int WeekOfYearISO8601(DateTime date)
+        /// <param name="listMonth"></param>
+        public void CalculateMonthPayments(List<ItemModel> listMonth)
         {
-            var day = (int)CultureInfo.CurrentCulture.Calendar.GetDayOfWeek(date);
-            return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(4 - (day == 0 ? 7 : day)),
-                CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        }
-
-
-
-        // Source http://stackoverflow.com/questions/19901666/get-date-of-first-and-last-day-of-week-knowing-week-number
-        public static DateTime FirstDateOfWeek(int year, int weekOfYear, System.Globalization.CultureInfo ci)
-        {
-            DateTime jan1 = new DateTime(year, 1, 1);
-            int daysOffset = (int)ci.DateTimeFormat.FirstDayOfWeek - (int)jan1.DayOfWeek;
-            DateTime firstWeekDay = jan1.AddDays(daysOffset);
-            int firstWeek = ci.Calendar.GetWeekOfYear(jan1, ci.DateTimeFormat.CalendarWeekRule, ci.DateTimeFormat.FirstDayOfWeek);
-            if ((firstWeek <= 1 || firstWeek >= 52) && daysOffset >= -3)
+            var result = from r in listPayments  // work around: group by doesn't work with table
+                         group r by new
+                         {
+                             y = r.PAY_DATE.Year,
+                             m = r.PAY_DATE.Month
+                         } into g
+                         select new
+                         {
+                             Month = new DateTime(g.Key.y, g.Key.m, 1),
+                             Sum = g.Sum(p => p.PAY_AMOUNT)
+                         };
+            foreach (var p in result)
             {
-                weekOfYear -= 1;
+                string str = p.Month.ToString("yyyy MMM");
+                ItemModel month = listMonth.Find(x => x.Item.Equals(str));
+                if (month != null)
+                {
+                    month.Collected = (int)p.Sum;
+                }
+                else
+                {
+                    listMonth.Add(new ItemModel() // Add item
+                    {
+                        Item = str,
+                        Expected = null,
+                        Collected = (int)p.Sum
+                    });
+                }
             }
-            return firstWeekDay.AddDays(weekOfYear * 7);
         }
 
-
-        private void CalculateWeekPayments(List<ItemModel> listWeek)
+        /// <summary>
+        /// Generates a list of the week payments.
+        /// </summary>
+        /// <param name="listWeek"></param>
+        public void CalculateWeekPayments(List<ItemModel> listWeek)
         {
-            var result = from r in listPayments  // work around: group by doest work with table
+            var result = from r in listPayments  // work around: group by doesn't work with table
                          group r by new
                          {
                              y = r.PAY_DATE.Year,
@@ -430,7 +398,6 @@ namespace Ideal
                              Year = g.Key.y,
                              Week = g.Key.w,
                              FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
-                             //LastWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture).AddDays(6),
                              Sum = g.Sum(p => p.PAY_AMOUNT)
                          };
             foreach (var p in result)
@@ -453,6 +420,69 @@ namespace Ideal
             }
         }
 
+        /// <summary>
+        /// Generates a list of the scheduled week payments.
+        /// </summary>
+        /// <param name="listWeek"></param>
+        public void CalculateScheduledWeekPayments(List<ItemModel> listWeek)
+        {
+            var result = from k in listScheduledPay // work around: group by doesn't work with table
+                         group k by new
+                         {
+                             y = k.SCHPAY_DATE.Year,
+                             w = WeekOfYearISO8601(k.SCHPAY_DATE)
+                         } into g
+                         select new
+                         {
+                             Year = g.Key.y,
+                             Week = g.Key.w,
+                             FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
+                             Sum = g.Sum(p => p.SCHPAY_AMOUNT)
+                         };
 
+            foreach (var p in result)
+            {
+                listWeek.Add(new ItemModel() // Add all items
+                {
+                    Item = String.Format("{0} {1:MMMdd}", p.Year, p.FirstWeekDay),
+                    Expected = (int)p.Sum,
+                    Collected = null
+                });
+            }
+        }
+        /// <summary>
+        /// Get date of first and last day of week knowing week number.
+        /// Source http://stackoverflow.com/questions/19901666/get-date-of-first-and-last-day-of-week-knowing-week-number
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="weekOfYear"></param>
+        /// <param name="ci"></param>
+        /// <returns></returns>
+        public static DateTime FirstDateOfWeek(int year, int weekOfYear, System.Globalization.CultureInfo ci)
+        {
+            DateTime jan1 = new DateTime(year, 1, 1);
+            int daysOffset = (int)ci.DateTimeFormat.FirstDayOfWeek - (int)jan1.DayOfWeek;
+            DateTime firstWeekDay = jan1.AddDays(daysOffset);
+            int firstWeek = ci.Calendar.GetWeekOfYear(jan1, ci.DateTimeFormat.CalendarWeekRule, ci.DateTimeFormat.FirstDayOfWeek);
+            if ((firstWeek <= 1 || firstWeek >= 52) && daysOffset >= -3)
+            {
+                weekOfYear -= 1;
+            }
+            return firstWeekDay.AddDays(weekOfYear * 7);
+        }
+
+        /// <summary>
+        /// Calculate the week number based on a given date.
+        /// Source: http://stackoverflow.com/questions/1497586/how-can-i-calculate-find-the-week-number-of-a-given-date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static int WeekOfYearISO8601(DateTime date)
+        {
+            var day = (int)CultureInfo.CurrentCulture.Calendar.GetDayOfWeek(date);
+            return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(date.AddDays(4 - (day == 0 ? 7 : day)),
+                CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
     }
+
 }
