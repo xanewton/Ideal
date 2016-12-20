@@ -10,7 +10,9 @@ namespace IdealTests
     [TestClass]
     public class GeneralUnitTest
     {
-        private String SAMPLE_DATABASE = "";
+        private String sampleDB = "";
+        private String modelDBPath = "";
+        private String sampleModelDBPath = "";
 
 
         [TestInitialize]
@@ -18,13 +20,15 @@ namespace IdealTests
         {
             // Find the sample database path
             string proyectPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
-            SAMPLE_DATABASE = proyectPath.Replace("IdealTests", "Ideal\\SampleDatabase.mdf");
+            sampleDB = proyectPath.Replace("IdealTests", "Ideal\\SampleDatabase.mdf");
+            modelDBPath = proyectPath.Replace("IdealTests", "Ideal\\DBModel");
+            sampleModelDBPath = proyectPath.Replace("IdealTests", "Ideal\\SampleDBModel");
         }
 
         [TestCleanup]
         public void CleanUp()
         {
-            SAMPLE_DATABASE = "";
+            sampleDB = "";
         }
 
 
@@ -34,7 +38,25 @@ namespace IdealTests
         [TestMethod]
         public void TestSampleDatabaseExists()
         {
-            Assert.AreEqual(true, File.Exists(SAMPLE_DATABASE));
+            Assert.AreEqual(true, File.Exists(sampleDB));
+        }
+
+        /// <summary>
+        /// Tests that the Sample database and the real database have the same tables, views.
+        /// </summary>
+        [TestMethod]
+        public void TestDatabaseModelMatchSampleDatabase()
+        {
+            // Read the file names and ensure that they exist in both directories.
+            foreach (string file in Directory.EnumerateFiles(modelDBPath, "*.cs"))
+            {
+                if (file.Contains("_TBL") || file.Contains("_VIEW"))
+                {
+                    String fileName = Path.GetFileName(file);
+                    String sampleFile = sampleModelDBPath + "\\" + fileName;
+                    Assert.AreEqual(true, File.Exists(sampleFile));
+                }
+            }
         }
     }
 }
