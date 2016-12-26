@@ -46,6 +46,25 @@ namespace Ideal
     }
 
     /// <summary>
+    /// Represents an account item on the Running Accounts page. 
+    /// </summary>
+    public class AccountModel
+    {
+        public string AccountID { get; set; }
+        public string ClientName { get; set; }
+        public string Item { get; set; }
+        public string PaymentID { get; set; }
+        public string Date { get; set; }
+        public double? AccountPrice { get; set; }
+        public double? Hitch { get; set; }
+        public double? Balance { get; set; }
+        public double? ItemPrice { get; set; }
+        public double? Payments { get; set; }
+        public double? ScheduledPayments { get; set; }
+        public double? DiffScheduled { get; set; }
+    }
+
+    /// <summary>
     /// Class to represent Month and Week comparations
     /// </summary>
     public class ItemModel
@@ -73,7 +92,7 @@ namespace Ideal
     {
 
         public ObservableCollection<CostComparationModel> CostComparations { get; set; }
-        public ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW> Accounts { get; set; }
+        public ObservableCollection<AccountModel> Accounts { get; set; }
         public ObservableCollection<ItemModel> Months { get; set; }
         public ObservableCollection<Model> TotalProgress { get; set; }
         public ObservableCollection<Model> TotalLag { get; set; }
@@ -145,25 +164,42 @@ namespace Ideal
         private void FillAccountSeries(IdealContext db)
 #endif
         {
-            var query = from account in db.ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW
-                        orderby account.ACC_ID
-                        select account;
+            var query = from a in db.ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW
+                        orderby a.ACC_ID
+                        select new { a.ACC_ID, a.NAME, a.ITEM_NAME, a.PAYMD_ID, a.ACC_DATE, a.ACC_PRICE,
+                                     a.ACC_HITCH, a.CALCULATED_CURRENT_BALANCE, a.ITEM_BUY_PRICE, a.PAYMENTS,
+                                     a.SUM_SCHEDULED_PAYMENTS, a.DIFF_SCHEDULED};
             if (!query.Any())
             {
                 return; // No results 
             }
-            Accounts = new ObservableCollection<ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW>();
+            Accounts = new ObservableCollection<AccountModel>();
             CostComparations = new ObservableCollection<CostComparationModel>();
             foreach (var acc in query)
             {
-                Accounts.Add(acc);     //Create the list of accounts
+                Accounts.Add( //Create the list of accounts
+                    new AccountModel()
+                    {
+                        AccountID = acc.ACC_ID,
+                        ClientName = acc.NAME,
+                        Item = acc.ITEM_NAME,
+                        PaymentID = acc.PAYMD_ID,
+                        Date = acc.ACC_DATE.ToString("MMM dd yyyy"),
+                        AccountPrice = (double) acc.ACC_PRICE,
+                        Hitch = (double) acc.ACC_HITCH,
+                        Balance = (double) acc.CALCULATED_CURRENT_BALANCE,
+                        ItemPrice = (double) acc.ITEM_BUY_PRICE,
+                        Payments = (double) acc.PAYMENTS,
+                        ScheduledPayments = (double) acc.SUM_SCHEDULED_PAYMENTS,
+                        DiffScheduled = (double) acc.DIFF_SCHEDULED
+                    });
                 CostComparations.Add(  // Create a list of CostComparations
                     new CostComparationModel()
                     {
                         AccountID = acc.ACC_ID,
-                        ItemPrice = (double)acc.ITEM_BUY_PRICE,
-                        Collected = (double)acc.PAYMENTS,
-                        Expected = (double)acc.SUM_SCHEDULED_PAYMENTS
+                        ItemPrice = (double) acc.ITEM_BUY_PRICE,
+                        Collected = (double) acc.PAYMENTS,
+                        Expected = (double) acc.SUM_SCHEDULED_PAYMENTS
                     });
             }
         }
@@ -192,12 +228,12 @@ namespace Ideal
             TotalProgress.Add(new Model()
             {
                 Item = "Balance",
-                Units = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE)
+                Units = (int)Accounts.Sum(x => x.Balance)
             });
             TotalProgress.Add(new Model()
             {
                 Item = "Collected",
-                Units = (int)Accounts.Sum(x => x.PAYMENTS)
+                Units = (int)Accounts.Sum(x => x.Payments)
             });
         }
 
@@ -215,22 +251,22 @@ namespace Ideal
             TotalLag.Add(new Model()
             {
                 Item = "Expected",
-                Units = (Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS) > 0) ?
-                            (int)(Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS)) : 0
+                Units = (Accounts.Sum(x => x.ScheduledPayments) - Accounts.Sum(x => x.Payments) > 0) ?
+                            (int)(Accounts.Sum(x => x.ScheduledPayments) - Accounts.Sum(x => x.Payments)) : 0
             });
             TotalLag.Add(new Model()
             {
                 Item = "Collected",
-                Units = (int)Accounts.Sum(x => x.PAYMENTS)
+                Units = (int)Accounts.Sum(x => x.Payments)
             });
         }
 
         private void FillStatusValues()
         {
-            PositiveAmount = (int)Accounts.Sum(x => x.PAYMENTS); // Collected
-            NegativeAmount = (Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS) > 0) ?
-                                (int)(Accounts.Sum(x => x.SUM_SCHEDULED_PAYMENTS) - Accounts.Sum(x => x.PAYMENTS)) : 0; //Lag
-            BalanceAmount = (int)Accounts.Sum(x => x.CALCULATED_CURRENT_BALANCE); //Balance
+            PositiveAmount = (int)Accounts.Sum(x => x.Payments); // Collected
+            NegativeAmount = (Accounts.Sum(x => x.ScheduledPayments) - Accounts.Sum(x => x.Payments) > 0) ?
+                                (int)(Accounts.Sum(x => x.ScheduledPayments) - Accounts.Sum(x => x.Payments)) : 0; //Lag
+            BalanceAmount = (int)Accounts.Sum(x => x.Balance); //Balance
         }
 
         /// <summary>
