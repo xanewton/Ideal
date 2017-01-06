@@ -72,6 +72,7 @@ namespace Ideal
         public string Item { get; set; }
         public int? Expected { get; set; }
         public int? Collected { get; set; }
+        public int? Order { get; set; } //Order of sorting in the list
     }
 
 
@@ -302,6 +303,8 @@ namespace Ideal
             List<ItemModel> listWeek = new List<ItemModel>();
             util.CalculateScheduledWeekPayments(listWeek);
             util.CalculateWeekPayments(listWeek);
+            // Order by date number
+            listWeek = listWeek.OrderBy(o => o.Order).ToList();
 
             // Add to the Observable list
             Weeks = new ObservableCollection<ItemModel>();
@@ -434,7 +437,8 @@ namespace Ideal
                              Year = g.Key.y,
                              Week = g.Key.w,
                              FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
-                             Sum = g.Sum(p => p.PAY_AMOUNT)
+                             Sum = g.Sum(p => p.PAY_AMOUNT),
+                             Order = (g.Key.y * 1000) + g.Key.w  // sorting order
                          };
             foreach (var p in result)
             {
@@ -450,7 +454,8 @@ namespace Ideal
                     {
                         Item = str,
                         Expected = null,
-                        Collected = (int)p.Sum
+                        Collected = (int)p.Sum,
+                        Order = p.Order
                     });
                 }
             }
@@ -466,26 +471,30 @@ namespace Ideal
                          group k by new
                          {
                              y = k.SCHPAY_DATE.Year,
-                             w = WeekOfYearISO8601(k.SCHPAY_DATE)
+                             w = WeekOfYearISO8601(k.SCHPAY_DATE),
                          } into g
                          select new
                          {
                              Year = g.Key.y,
                              Week = g.Key.w,
                              FirstWeekDay = FirstDateOfWeek(g.Key.y, g.Key.w, CultureInfo.CurrentCulture),
-                             Sum = g.Sum(p => p.SCHPAY_AMOUNT)
+                             Sum = g.Sum(p => p.SCHPAY_AMOUNT),
+                             Order = (g.Key.y * 1000) + g.Key.w  // sorting order
                          };
 
-            foreach (var p in result)
+            foreach (var p in result) // Add all items
             {
-                listWeek.Add(new ItemModel() // Add all items
+                ItemModel item = new ItemModel() // Create item
                 {
                     Item = String.Format("{0} {1:MMMdd}", p.Year, p.FirstWeekDay),
                     Expected = (int)p.Sum,
-                    Collected = null
-                });
+                    Collected = null,
+                    Order = p.Order
+                };
+                listWeek.Add(item);
             }
         }
+
         /// <summary>
         /// Get date of first and last day of week knowing week number.
         /// Source http://stackoverflow.com/questions/19901666/get-date-of-first-and-last-day-of-week-knowing-week-number
