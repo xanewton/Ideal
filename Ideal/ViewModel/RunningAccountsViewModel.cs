@@ -336,13 +336,20 @@ namespace Ideal
         public void FillPaymentLists(IdealContext db)
 #endif
         {
+            var accounts = new List<String>();
+            var queryAccounts = from a in db.ACCOUNT_CLIENT_SCHEDULED_PAYMENTS_VIEW
+                                select a.ACC_ID;
+            foreach (var a in queryAccounts)
+                accounts.Add(a);
+
             // Get Scheduled Payments table
             listScheduledPay = new List<SCHEDULED_PAYMENT_TBL>();
             var queryScheduledPay = from p in db.SCHEDULED_PAYMENT_TBL
                                     select p;
             foreach (var p in queryScheduledPay)
             {
-                listScheduledPay.Add(p);
+               //if (accounts.Any(p.ACC_ID.Contains))
+                    listScheduledPay.Add(p);
             }
 
             // Get Payments table
