@@ -14,7 +14,8 @@ All components are intended to use free Technology.
 Notes
 -----
 ### Technology
-- The application was developed using Microsoft Visual Sudio Community 2015.
+- The application was developed using Microsoft Visual Sudio Community 2015 
+  and latter migrated to Microsoft Visual Sudio Community 2017. 
 - The application uses C# and Windows Presentation Fundation (WPF).
 - The database use Microsoft SQL Server 2016 Express or a local database.
 - SyncFussion charts 
@@ -86,7 +87,7 @@ Notes
 
 License
 -------
-Copyright 2016 Angel Garcia
+Copyright 2017 Angel Garcia
 
 Licensed to the Apache Software Foundation (ASF) under one or more contributor
 license agreements.  See the NOTICE file distributed with this work for
