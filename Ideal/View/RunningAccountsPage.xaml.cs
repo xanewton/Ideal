@@ -1,6 +1,6 @@
 ﻿#region Copyright
 /*
- * Copyright (C) 2016 Angel Garcia
+ * Copyright (C) 2016 Angel Newton
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
